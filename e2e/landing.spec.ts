@@ -166,3 +166,14 @@ test('the header Install link leads to the install section', async ({
   await expect(page.locator('#install [data-install]')).toBeVisible();
   await expect(page.locator('#install')).toContainText('MIT license');
 });
+
+test('a click draws a ring that is gone again after 600 ms', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const rings = page.locator('[data-click-rings] .ring');
+  await page.mouse.click(200, 300);
+  await expect(rings).toHaveCount(1);
+  await page.waitForTimeout(600);
+  await expect(rings).toHaveCount(0);
+});
