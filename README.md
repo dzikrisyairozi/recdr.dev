@@ -1,16 +1,33 @@
+<div align="center">
+
+<img src="public/favicon.svg" width="96" alt="recdr">
+
 # recdr.dev
 
-The source of [recdr.dev](https://recdr.dev), the site for
-[recdr](https://github.com/dzikrisyairozi/recdr). recdr is a screen recorder
-that leaves files an AI agent can read. Its code lives in its own repository;
-this one holds only the site.
+**Screen recorder your agent can use.**
 
-The site is a static Astro 7 build with no server. It serves:
+The site for [recdr](https://github.com/dzikrisyairozi/recdr): home page, docs, changelog and blog.
 
-- `/install.sh` and `/install.ps1`, which redirect to the install scripts of
-  the latest recdr release, so the install commands in the recdr README work
-- the home page
-- the docs, the changelog and the blog, which are added one module at a time
+[Website](https://recdr.dev) · [Docs](https://recdr.dev/docs/) · [Changelog](https://recdr.dev/changelog/) · [Blog](https://recdr.dev/blog/) · [recdr on GitHub](https://github.com/dzikrisyairozi/recdr)
+
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![CI](https://github.com/dzikrisyairozi/recdr.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/dzikrisyairozi/recdr.dev/actions/workflows/ci.yml)
+[![recdr release](https://img.shields.io/github/v/release/dzikrisyairozi/recdr?label=recdr)](https://github.com/dzikrisyairozi/recdr/releases/latest)
+
+<a href="https://recdr.dev"><img src="docs/images/home.png" alt="The recdr.dev home page: the headline, the install command, and a recording of a checkout page turning into a grid of frames" width="800"></a>
+
+</div>
+
+recdr records a window, a screen region, a monitor or a Chrome tab, and leaves files an AI agent can read: a GIF or MP4 for people, and for the agent a contact sheet of the moments where the screen changed, a per-frame change log and the stored frames as PNG. Its code lives in its own repository; this one holds only the site.
+
+The site is a static Astro 7 build on Cloudflare Pages, with no server. It serves:
+
+- the home page, with a real recdr recording (`src/assets/demo/`)
+- `/docs/`, built with Starlight from the recdr README
+- `/changelog/`, read from the GitHub releases at build time
+- `/blog/`, with an RSS feed
+- `/install.sh` and `/install.ps1`, which redirect to the install scripts of the latest recdr release
+- a social card for every page, `/sitemap-index.xml` and `/llms.txt`
 
 ## Requirements
 
