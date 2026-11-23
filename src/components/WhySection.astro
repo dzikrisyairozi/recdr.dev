@@ -76,6 +76,8 @@ const lastFrame = frames.at(-1)!;
     display: grid;
     grid-template-columns: 1fr;
     width: min(100%, calc((100svh - 20rem) * 1.49));
+    /* a very short window would otherwise shrink the figures to nothing */
+    min-width: min(100%, 20rem);
     margin-inline: auto;
   }
 

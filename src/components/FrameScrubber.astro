@@ -1,6 +1,6 @@
 ---
 import { Image, getImage } from 'astro:assets';
-import { frames } from '../lib/demo-assets.ts';
+import { frames, manifest } from '../lib/demo-assets.ts';
 
 const strip = await Promise.all(
   frames.map(async (frame) => ({
@@ -24,8 +24,8 @@ const first = strip[0]!;
       <img
         data-scrub-image
         src={first.full}
-        width="960"
-        height="600"
+        width={manifest.width}
+        height={manifest.height}
         alt="The recorded checkout page at the selected frame"
         loading="lazy"
         decoding="async"

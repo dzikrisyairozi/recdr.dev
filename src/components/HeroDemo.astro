@@ -26,7 +26,14 @@ const firstFrame = frames[0]!;
     </div>
   </div>
   <div class="page">
-    <Image src={firstFrame.image} width={480} alt="" loading="eager" />
+    <Image
+      src={firstFrame.image}
+      width={480}
+      widths={[480, 960]}
+      sizes="(min-width: 64rem) 32rem, 100vw"
+      alt=""
+      loading="eager"
+    />
     {click && (
       <span class="ring" style={`left: ${click.x}%; top: ${click.y}%`} />
     )}
