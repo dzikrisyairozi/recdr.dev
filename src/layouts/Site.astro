@@ -10,9 +10,11 @@ import FooterContent from '../components/FooterContent.astro';
 interface Props {
   title: string;
   description: string;
+  /** True on a page that search engines should not list, such as the 404 page. */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // The home page's title already starts with the name.
 const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
@@ -25,7 +27,11 @@ const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <link rel="canonical" href={canonical} />
+    )}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- The headline is set in Geist. Fetched early, the font is there for
          the first paint and the text does not reflow when it arrives. -->

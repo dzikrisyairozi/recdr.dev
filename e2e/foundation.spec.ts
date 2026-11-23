@@ -119,3 +119,19 @@ test('every page but the home page has the site name in its title', async ({
   await page.goto('/nowhere/');
   await expect(page).toHaveTitle('Page not found | recdr');
 });
+
+test('the 404 page is kept out of search indexes', async ({ page }) => {
+  await page.goto('/nowhere/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    'content',
+    'noindex',
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+
+  await page.goto('/');
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://recdr.dev/',
+  );
+});
