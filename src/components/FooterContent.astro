@@ -1,0 +1,52 @@
+---
+// Shared by Site.astro and the Starlight footer override, so it styles itself.
+---
+
+<div class="footer-content">
+  <img src="/favicon.svg" alt="" width="24" height="24" />
+  <p>recdr is open source under the MIT license.</p>
+  <ul>
+    <li>
+      <a href="https://github.com/dzikrisyairozi/recdr">Source on GitHub</a>
+    </li>
+    <li>
+      <a href="https://github.com/dzikrisyairozi/recdr/releases">Releases</a>
+    </li>
+  </ul>
+</div>
+
+<style>
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-6);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+  }
+
+  p {
+    margin: 0;
+    margin-inline-end: auto;
+  }
+
+  ul {
+    display: flex;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding-block: var(--space-3);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--rec);
+  }
+</style>
