@@ -3,40 +3,216 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Checkout</title>
+    <title>Checkout · keyboards.example</title>
     <!--
-      The page recdr records for the landing page (see RECORDING.md).
-      The bar and the toast move because recdr stores only frames that
-      changed: a page that jumps between states leaves three or four frames.
+      The page recdr records for the landing page (see RECORDING.md): the
+      checkout of a store that does not exist. One click on Buy runs the whole
+      flow. The payment fails once, a red banner says so for under half a
+      second, and the page ends on "Order confirmed", so a screenshot taken
+      afterwards shows nothing wrong.
+
+      Every step moves, because recdr stores only frames that changed.
+      Nothing is loaded from the network: no font, no image, no script.
     -->
     <style>
+      :root {
+        --brand: #4f46e5;
+        --ink: #14151a;
+        --muted: #6b7080;
+        --line: #e4e5ee;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
+        height: 100vh;
         margin: 0;
-        background: #f3f4f6;
-        color: #16181d;
+        overflow: hidden;
+        background: #f4f5fb;
+        color: var(--ink);
         font-family: system-ui, sans-serif;
       }
 
-      main {
-        width: 420px;
-        margin: 64px auto 0;
-        padding: 28px;
-        border: 1px solid #dfe2e8;
-        border-radius: 12px;
+      header {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+        padding: 0 96px;
+        border-bottom: 1px solid var(--line);
         background: #fff;
       }
 
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .wordmark::before {
+        content: '';
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: var(--brand);
+      }
+
+      .steps {
+        display: flex;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        color: var(--muted);
+        font-size: 16px;
+        list-style: none;
+      }
+
+      .steps li + li::before {
+        content: '›';
+        margin-right: 14px;
+      }
+
+      .steps [aria-current] {
+        color: var(--brand);
+        font-weight: 600;
+      }
+
+      /* Slides out from under the header, which is opaque and above it. */
+      #banner {
+        position: fixed;
+        z-index: 1;
+        top: 72px;
+        right: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        height: 72px;
+        background: #dc2626;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 600;
+        transform: translateY(-100%);
+        transition: transform 150ms ease-out;
+      }
+
+      #banner::before {
+        content: '!';
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        font-size: 20px;
+      }
+
+      #banner.show {
+        transform: none;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 1fr 440px;
+        gap: 48px;
+        padding: 104px 96px 0;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+      }
+
+      .product {
+        padding: 28px;
+      }
+
+      .photo {
+        display: grid;
+        place-items: center;
+        height: 300px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #eef0ff, #dfe3ff);
+      }
+
+      .keyboard {
+        display: grid;
+        gap: 8px;
+        padding: 16px;
+        border-radius: 16px;
+        background: #23253a;
+        box-shadow: 0 18px 30px -12px rgb(35 37 58 / 0.55);
+        transform: rotate(-4deg);
+      }
+
+      .keyboard div {
+        display: flex;
+        gap: 8px;
+      }
+
+      .keyboard span {
+        flex: 1 0 30px;
+        height: 30px;
+        border-radius: 6px;
+        background: #f1f2f8;
+        box-shadow: 0 3px 0 #b9bdd4;
+      }
+
+      .keyboard .wide {
+        flex-grow: 4;
+      }
+
+      .keyboard .accent {
+        background: var(--brand);
+        box-shadow: 0 3px 0 #3730a3;
+      }
+
       h1 {
-        margin: 0 0 20px;
-        font-size: 22px;
+        margin: 24px 0 6px;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+      }
+
+      .product p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 17px;
+      }
+
+      /* Both views sit in one cell, so the card keeps its height when the
+         order gives way to the confirmation. */
+      .summary {
+        display: grid;
+        align-self: start;
+        padding: 32px;
+      }
+
+      .summary > * {
+        grid-area: 1 / 1;
+        transition: opacity 150ms;
+      }
+
+      h2 {
+        margin: 0 0 22px;
+        font-size: 23px;
+        letter-spacing: -0.01em;
       }
 
       dl {
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 10px 16px;
-        margin: 0 0 24px;
-        font-size: 15px;
+        gap: 14px 16px;
+        margin: 0 0 28px;
+        font-size: 17px;
       }
 
       dd {
@@ -45,41 +221,43 @@
       }
 
       .total {
-        padding-top: 10px;
-        border-top: 1px solid #dfe2e8;
-        font-weight: 600;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+        font-size: 21px;
+        font-weight: 700;
       }
 
       #buy {
         width: 100%;
-        height: 48px;
+        height: 56px;
         border: 0;
-        border-radius: 8px;
-        background: #16181d;
+        border-radius: 12px;
+        background: var(--brand);
         color: #fff;
         font: inherit;
-        font-size: 16px;
+        font-size: 19px;
+        font-weight: 600;
         cursor: pointer;
       }
 
       #buy:disabled {
-        background: #6b7280;
+        background: #a5a8ee;
         cursor: default;
       }
 
       .bar {
-        height: 4px;
-        margin-top: 10px;
+        height: 6px;
+        margin-top: 14px;
         overflow: hidden;
-        border-radius: 2px;
-        background: #e5e7eb;
+        border-radius: 3px;
+        background: var(--line);
       }
 
       .bar span {
         display: block;
         width: 0;
         height: 100%;
-        background: #16181d;
+        background: var(--brand);
       }
 
       .bar.run span {
@@ -87,69 +265,160 @@
         transition: width 600ms linear;
       }
 
-      .toast {
-        position: fixed;
-        bottom: 40px;
-        left: 50%;
-        padding: 14px 22px;
-        border-radius: 8px;
-        background: #0f7b3f;
-        color: #fff;
-        font-size: 15px;
+      .confirmed {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 10px;
         opacity: 0;
-        transform: translate(-50%, 16px);
-        transition:
-          transform 300ms,
-          opacity 300ms;
+        /* it lies over the Buy button until the order is confirmed */
+        pointer-events: none;
+        text-align: center;
       }
 
-      .toast.show {
+      .confirmed h2 {
+        margin: 12px 0 0;
+        font-size: 30px;
+      }
+
+      .confirmed p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .check {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: #16a34a;
+      }
+
+      .check path {
+        fill: none;
+        stroke: #fff;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 6;
+      }
+
+      .summary[data-view='confirmed'] .order {
+        opacity: 0;
+      }
+
+      .summary[data-view='confirmed'] .confirmed {
         opacity: 1;
-        transform: translate(-50%, 0);
+      }
+
+      .summary[data-view='confirmed'] .check path {
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 400ms ease-out 150ms;
       }
     </style>
   </head>
   <body>
+    <header>
+      <div class="wordmark">keyboards.example</div>
+      <ol class="steps">
+        <li>Cart</li>
+        <li aria-current="step">Checkout</li>
+        <li>Done</li>
+      </ol>
+    </header>
     <main>
-      <h1>Order summary</h1>
-      <dl>
-        <dt>Mechanical keyboard</dt>
-        <dd>$89.00</dd>
-        <dt>Shipping</dt>
-        <dd>$6.00</dd>
-        <dt class="total">Total</dt>
-        <dd class="total">$95.00</dd>
-      </dl>
-      <button id="buy" type="button">Buy</button>
-      <div class="bar"><span></span></div>
+      <section class="card product">
+        <div class="photo">
+          <div class="keyboard" aria-hidden="true"></div>
+        </div>
+        <h1>Mechanical keyboard</h1>
+        <p>75% layout · tactile switches · USB-C</p>
+      </section>
+      <section class="card summary" id="summary">
+        <div class="order">
+          <h2>Order summary</h2>
+          <dl>
+            <dt>Mechanical keyboard</dt>
+            <dd>$89.00</dd>
+            <dt>Shipping</dt>
+            <dd>$6.00</dd>
+            <dt class="total">Total</dt>
+            <dd class="total">$95.00</dd>
+          </dl>
+          <button id="buy" type="button">Buy</button>
+          <div class="bar"><span></span></div>
+        </div>
+        <div class="confirmed" aria-hidden="true">
+          <svg class="check" viewBox="0 0 96 96" aria-hidden="true">
+            <path d="M30 50 L43 63 L67 36" />
+          </svg>
+          <h2>Order confirmed</h2>
+          <p>Order #1042 · $95.00</p>
+        </div>
+      </section>
     </main>
     <script>
+      // The keyboard: four rows of keys, with a wide space bar in the last.
+      const keyboard = document.querySelector('.keyboard');
+      [
+        'k k k k k k k k k k k a',
+        'k k k k k k k k k k k k',
+        'k k k k k k k k k k k a',
+        'k k k w k k k',
+      ].forEach((keys) => {
+        const row = document.createElement('div');
+        for (const key of keys.split(' ')) {
+          const cap = document.createElement('span');
+          if (key === 'w') cap.className = 'wide';
+          if (key === 'a') cap.className = 'accent';
+          row.append(cap);
+        }
+        keyboard.append(row);
+      });
+
       const buy = document.getElementById('buy');
       const bar = document.querySelector('.bar');
+      const summary = document.getElementById('summary');
+      // Two frames, so the browser has painted the change before fn runs.
+      const painted = (fn) =>
+        requestAnimationFrame(() => requestAnimationFrame(fn));
+
+      // demo/record.ts reads these to find the banner in the recording.
+      window.__demo = {};
 
       buy.addEventListener('click', () => {
         buy.disabled = true;
         buy.textContent = 'Processing…';
         bar.classList.add('run');
-
-        setTimeout(() => {
-          buy.textContent = 'Paid';
-          const toast = document.createElement('div');
-          toast.className = 'toast';
-          toast.setAttribute('role', 'status');
-          toast.textContent = 'Payment accepted';
-          document.body.append(toast);
-          // Two frames, so the browser paints the start state before it moves.
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => toast.classList.add('show')),
-          );
-          // 300 ms to arrive, 1500 ms on screen, 300 ms to leave.
-          setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-          }, 1800);
-        }, 600);
+        setTimeout(failOnce, 600);
       });
+
+      // 150 ms to arrive, 150 ms on screen, 150 ms to leave.
+      function failOnce() {
+        const banner = document.createElement('div');
+        banner.id = 'banner';
+        banner.setAttribute('role', 'alert');
+        banner.textContent = 'Payment failed';
+        document.body.append(banner);
+        painted(() => {
+          window.__demo.bannerFrom = Date.now();
+          banner.classList.add('show');
+          setTimeout(() => banner.classList.remove('show'), 300);
+          setTimeout(() => {
+            banner.remove();
+            painted(() => (window.__demo.bannerUntil = Date.now()));
+            confirm();
+          }, 450);
+        });
+      }
+
+      function confirm() {
+        summary.dataset.view = 'confirmed';
+        summary.querySelector('.confirmed').removeAttribute('aria-hidden');
+        // 150 ms for the views to swap, 400 ms for the check mark.
+        setTimeout(() => (document.body.dataset.state = 'confirmed'), 600);
+      }
     </script>
   </body>
 </html>
