@@ -1,0 +1,134 @@
+---
+import Site from '../layouts/Site.astro';
+import { REPO } from '../lib/github.ts';
+import { getReleases } from '../lib/site-data.ts';
+
+const releases = await getReleases();
+const releasesUrl = `https://github.com/${REPO}/releases`;
+---
+
+<Site
+  title="Changelog"
+  description="Every recdr release and what changed in it."
+>
+  <section>
+    <h1>Changelog</h1>
+    {releases === null ? (
+      <p>
+        Release notes are <a href={releasesUrl}>on GitHub</a>.
+      </p>
+    ) : releases.length === 0 ? (
+      <p>
+        No releases yet. Watch <a href={releasesUrl}>the releases page</a>.
+      </p>
+    ) : (
+      releases.map((release) => (
+        <article>
+          <header>
+            <h2>
+              <a href={release.url}>{release.tag}</a>
+            </h2>
+            <time datetime={release.date}>{release.date.slice(0, 10)}</time>
+            {release.prerelease && <span class="pre">Pre-release</span>}
+          </header>
+          <div class="notes" set:html={release.html} />
+        </article>
+      ))
+    )}
+  </section>
+</Site>
+
+<style>
+  section {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding: var(--space-24) var(--space-4);
+  }
+
+  h1 {
+    margin: 0 0 var(--space-12);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  article {
+    padding-block: var(--space-8);
+    border-top: 1px solid var(--border);
+  }
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: 600;
+  }
+
+  h2 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--rec);
+  }
+
+  time,
+  .pre {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .pre {
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+
+  /* GitHub renders the notes, so their elements carry no scope attribute. */
+  .notes {
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .notes :global(:is(h1, h2, h3, h4)) {
+    margin: var(--space-6) 0 var(--space-2);
+    color: var(--text);
+    font-size: var(--text-base);
+    font-weight: 600;
+  }
+
+  .notes :global(:is(p, ul, ol, pre)) {
+    margin: 0 0 var(--space-4);
+  }
+
+  .notes :global(:is(ul, ol)) {
+    padding-inline-start: var(--space-6);
+  }
+
+  .notes :global(code) {
+    color: var(--text);
+    font-size: 0.9em;
+  }
+
+  .notes :global(pre) {
+    padding: var(--space-4);
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .notes :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
