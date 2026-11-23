@@ -73,7 +73,6 @@ const lastFrame = frames.at(-1)!;
      wipes the contact sheet in over the screenshot. The width comes from the
      viewport height, so the taller figure fits on one screen. */
   section[data-scene-active] .figures {
-    display: grid;
     grid-template-columns: 1fr;
     width: min(100%, calc((100svh - 20rem) * 1.49));
     /* a very short window would otherwise shrink the figures to nothing */

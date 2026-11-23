@@ -20,13 +20,9 @@ export function initScrubber(): void {
     image.src = frame.full ?? '';
     readout.textContent = `frame ${frame.label} · ${frame.timecode} · ${frame.changed} changed`;
 
-    // data-box is "x,y,width,height" in percent, or empty for an unchanged frame.
-    const [x, y, width, height] = (frame.box ?? '').split(',');
+    // data-box is the box's position as CSS, or empty for an unchanged frame.
     box.hidden = !frame.box;
-    box.style.left = `${x}%`;
-    box.style.top = `${y}%`;
-    box.style.width = `${width}%`;
-    box.style.height = `${height}%`;
+    box.style.cssText = frame.box ?? '';
   };
 
   buttons.forEach((button, index) => {

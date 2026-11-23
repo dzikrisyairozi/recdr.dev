@@ -8,7 +8,7 @@ const strip = await Promise.all(
     full: (await getImage({ src: frame.image, width: 960, format: 'webp' }))
       .src,
     boxAttr: frame.box
-      ? `${frame.box.x},${frame.box.y},${frame.box.width},${frame.box.height}`
+      ? `left:${frame.box.x}%;top:${frame.box.y}%;width:${frame.box.width}%;height:${frame.box.height}%`
       : '',
   })),
 );

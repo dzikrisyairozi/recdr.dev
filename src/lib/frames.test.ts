@@ -47,7 +47,6 @@ test('buildFrames joins the manifest and the change log by position', () => {
   const [first, second] = buildFrames(manifest, diff);
 
   assert.deepEqual(first, {
-    index: 1,
     file: 'frames/000001.png',
     label: '000001',
     timecode: '00:00.0',
@@ -56,7 +55,6 @@ test('buildFrames joins the manifest and the change log by position', () => {
     box: null,
   });
   assert.deepEqual(second, {
-    index: 2,
     file: 'frames/000002.png',
     label: '000002',
     timecode: '00:00.1',

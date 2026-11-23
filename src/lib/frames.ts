@@ -21,17 +21,6 @@ export type Diff = {
   }[];
 };
 
-export type FrameView = {
-  index: number;
-  file: string;
-  label: string;
-  timecode: string;
-  changed: string;
-  keyframe: boolean;
-  /** In percent of the frame's width and height, so it scales with the image. */
-  box: Box | null;
-};
-
 export function percent(part: number, whole: number): number {
   return Math.round((part / whole) * 1000) / 10;
 }
@@ -40,7 +29,8 @@ export function formatChanged(fraction: number): string {
   return `${percent(fraction, 1)}%`;
 }
 
-export function buildFrames(manifest: Manifest, diff: Diff): FrameView[] {
+/** One entry per frame. `box` is in percent of the frame, so it scales with the image. */
+export function buildFrames(manifest: Manifest, diff: Diff) {
   if (manifest.frames.length !== diff.frames.length) {
     throw new Error(
       `manifest.json has ${manifest.frames.length} frames, diff.json has ${diff.frames.length}`,
@@ -50,7 +40,6 @@ export function buildFrames(manifest: Manifest, diff: Diff): FrameView[] {
     const change = diff.frames[i]!;
     const box = change.bbox;
     return {
-      index: frame.index,
       file: frame.file,
       label: frame.file.replace(/^.*\//, '').replace(/\.png$/, ''),
       // Rounded to the nearest tenth, the way recdr labels the tiles of its

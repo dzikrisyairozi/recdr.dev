@@ -5,10 +5,11 @@ import { spawn } from 'node:child_process';
 import { cp, readdir, readFile, rm } from 'node:fs/promises';
 import { userInfo } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { setTimeout as sleep } from 'node:timers/promises';
+import { pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.resolve(import.meta.dirname, '..');
 // recdr's default output root. Recording there keeps the absolute paths
 // inside result.json free of a temp folder under the user's profile.
 const outRoot = path.join(root, '.recdr');
@@ -66,7 +67,7 @@ try {
       throw new Error('recdr exited before it attached to the tab');
     }),
   ]);
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await sleep(1500);
   await page.click('#buy');
 
   const code = await exited;

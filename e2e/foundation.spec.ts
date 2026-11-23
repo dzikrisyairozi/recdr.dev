@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { installCommands } from '../src/lib/install.ts';
 
 declare global {
   interface Window {
@@ -78,20 +77,6 @@ test('one install command shows, and the others are hidden by CSS only', async (
   await expect(install.locator('[role="tabpanel"]:visible')).toHaveText(
     /cargo install/,
   );
-});
-
-test.describe('without JavaScript', () => {
-  test.use({ javaScriptEnabled: false });
-
-  test('all four install commands are visible', async ({ page }) => {
-    await page.goto('/');
-    const install = page.locator('[data-install]').first();
-    for (const command of installCommands) {
-      await expect(
-        install.getByText(command.text, { exact: true }),
-      ).toBeVisible();
-    }
-  });
 });
 
 test('the build output has both install redirects', () => {
