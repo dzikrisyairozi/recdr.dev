@@ -95,3 +95,78 @@ video {
   opacity: 0;
   transform: translateY(1rem);
 }
+
+/* A page of text outside the landing page: the changelog, the blog. */
+.page {
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: var(--space-24) var(--space-4);
+}
+
+.page-title {
+  margin: 0 0 var(--space-6);
+  font-size: clamp(2.25rem, 8vw, var(--text-3xl));
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* The date of a post or a release. */
+.page time {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* HTML that comes from Markdown: a blog post, a release's notes. */
+.prose {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.prose :is(h1, h2, h3, h4) {
+  margin: var(--space-8) 0 var(--space-2);
+  color: var(--text);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.prose :is(p, ul, ol) {
+  margin: 0 0 var(--space-4);
+}
+
+.prose :is(ul, ol) {
+  padding-inline-start: var(--space-6);
+}
+
+/* Inline code only. A code block keeps the size its own styles give it. */
+.prose :not(pre) > code {
+  color: var(--text);
+  font-size: 0.9em;
+}
+
+/* Starlight's Expressive Code draws the code blocks of every Markdown file,
+   a post's too. It reads the colours of its box from Starlight's variables
+   on :root, which only a docs page defines. tokens.css maps the ones the docs
+   set as well; the rest are given here. */
+:root {
+  --sl-color-gray-7: var(--surface);
+  --sl-color-text: var(--text);
+  --sl-text-code: var(--text-sm);
+  --sl-line-height: 1.75;
+}
+
+.prose .expressive-code {
+  margin-bottom: var(--space-4);
+}
+
+/* Release notes from GitHub. Code blocks in a post are drawn by Expressive
+   Code, which styles its own <pre>. */
+.prose pre:not(.expressive-code pre) {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
