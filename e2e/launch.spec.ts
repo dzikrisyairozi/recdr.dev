@@ -70,3 +70,37 @@ for (const path of ['/', '/docs/install/']) {
     }
   });
 }
+
+test('the landing page describes recdr and its FAQ as structured data', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const data = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ??
+      '',
+  ) as { '@graph': { '@type': string; [key: string]: unknown }[] };
+  const [app, faq] = data['@graph'];
+
+  expect(app).toMatchObject({
+    '@type': 'SoftwareApplication',
+    name: 'recdr',
+    url: 'https://recdr.dev/',
+    operatingSystem: 'Windows, macOS, Linux',
+    license: 'https://opensource.org/license/mit',
+  });
+
+  // One entry per question on the page, with the answer as plain text.
+  const asked = await page.locator('#faq h3').allInnerTexts();
+  const entries = faq?.mainEntity as {
+    name: string;
+    acceptedAnswer: { text: string };
+  }[];
+  expect(faq?.['@type']).toBe('FAQPage');
+  expect(entries.map((entry) => entry.name)).toEqual(asked);
+  for (const entry of entries) {
+    expect(entry.acceptedAnswer.text).not.toContain('<');
+  }
+  expect(entries[0]?.acceptedAnswer.text).toContain(
+    'which is ./.recdr unless you pass --out.',
+  );
+});
