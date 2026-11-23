@@ -44,6 +44,18 @@ function warn(what: string, error: unknown): null {
   return null;
 }
 
+// The page prints each release as an <h2>, so the highest heading in its
+// notes becomes an <h3> and the ones under it move down with it.
+function demoteHeadings(html: string): string {
+  const levels = [...html.matchAll(/<h([1-6])/g)].map((m) => Number(m[1]));
+  const shift = Math.max(0, 3 - Math.min(...levels));
+  return html.replace(
+    /<(\/?)h([1-6])/g,
+    (_, slash: string, level: string) =>
+      `<${slash}h${Math.min(6, Number(level) + shift)}`,
+  );
+}
+
 function toRelease(entry: unknown): Release {
   if (
     !isRecord(entry) ||
@@ -62,7 +74,10 @@ function toRelease(entry: unknown): Release {
     date: entry.published_at,
     url: entry.html_url,
     prerelease: entry.prerelease === true,
-    html: typeof entry.body_html === 'string' ? entry.body_html : '',
+    html:
+      typeof entry.body_html === 'string'
+        ? demoteHeadings(entry.body_html)
+        : '',
   };
 }
 

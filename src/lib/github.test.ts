@@ -132,3 +132,22 @@ test('formatStars hides zero and shortens thousands, rounded down', () => {
   assert.equal(formatStars(1234), '1.2k');
   assert.equal(formatStars(15600), '15.6k');
 });
+
+test('fetchReleases moves the headings of the notes under the release heading', async () => {
+  // The page prints each release as an <h2>.
+  const notes = (html: string) =>
+    fetchReleases(fakeFetch([{ ...apiReleases[1], body_html: html }]).fetchFn);
+  assert.equal(
+    (await notes("<h2>What's Changed</h2><h3>Fixes</h3><hr><p>x</p>"))?.[0]
+      ?.html,
+    "<h3>What's Changed</h3><h4>Fixes</h4><hr><p>x</p>",
+  );
+  assert.equal(
+    (await notes('<h1>Notes</h1><h6>Small</h6>'))?.[0]?.html,
+    '<h3>Notes</h3><h6>Small</h6>',
+  );
+  assert.equal(
+    (await notes('<h4>Already low</h4>'))?.[0]?.html,
+    '<h4>Already low</h4>',
+  );
+});
