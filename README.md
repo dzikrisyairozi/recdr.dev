@@ -1,355 +1,84 @@
-# 🚀 Monorepo Full-Stack Starter
+# recdr.dev
 
-A production-ready fullstack starter built with **Turborepo** monorepo architecture, featuring **Next.js 15** frontend, a high-performance **Rust (Axum)** backend, and a comprehensive **shadcn/ui** component library. Includes a **React** admin dashboard, **SQLx (PostgreSQL)**, **Docker** support, and complete developer tooling with **ESLint**, **Prettier**, **Husky**, and **Commitlint** for an optimal development experience.
+The source of [recdr.dev](https://recdr.dev), the site for
+[recdr](https://github.com/dzikrisyairozi/recdr). recdr is a screen recorder
+that leaves files an AI agent can read. Its code lives in its own repository;
+this one holds only the site.
 
-<div align="center">
+The site is a static Astro 7 build with no server. It serves:
 
-[![Docs](https://img.shields.io/badge/Documentation-Ready-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://docs-starter.dzikrisyairozi.com/docs)
-[![Web Preview](https://img.shields.io/badge/Web_Preview-Live-orange?style=for-the-badge&logo=vercel&logoColor=white)](https://web-starter.dzikrisyairozi.com/)
-[![Dashboard Preview](https://img.shields.io/badge/Dashboard-Live-purple?style=for-the-badge&logo=react&logoColor=white)](https://dashboard-starter.dzikrisyairozi.com/)
+- `/install.sh` and `/install.ps1`, which redirect to the install scripts of
+  the latest recdr release, so the install commands in the recdr README work
+- the home page
+- the docs, the changelog and the blog, as the modules in
+  [the spec](spec/1-recdr-dev-site/spec.md) land
 
-</div>
+## Requirements
 
-## ✨ Features
+- Node 24.16 or later (`.node-version` holds the major version)
+- pnpm 9
 
-- 🏗️ **Turborepo** - High-performance build system for JavaScript/TypeScript monorepos
-- ⚡ **Next.js 15** - React framework with App Router for Web & Docs
-- 🦀 **Rust** - Ultra-fast backend API built with **Axum** and **SQLx**
-- 🛠️ **TanStack Router** - Type-safe routing for the fast admin dashboard
-- 🎨 **shadcn/ui** - Beautiful, accessible UI components built with Radix UI and Tailwind CSS
-- ✨ **Framer Motion & Three.js** - Premium 3D animations and smooth transitions
-- 🎯 **TypeScript** - Full type safety across all frontend applications
-- 🎨 **Tailwind CSS** - Utility-first CSS framework
-- 📱 **Responsive Design** - Mobile-first approach with dark/light mode support
-- 🔧 **Developer Experience** - ESLint, Prettier, Husky, and Commitlint pre-configured
-- 🌍 **Internationalization (i18n)** - Full multi-language support (English/Indonesian) across Web, Docs, and Dashboard
-- 🐳 **Docker Ready** - Containerization support for easy deployment
-- 🔄 **CI/CD** - GitHub Actions workflows included
-
-## 📦 What's Inside?
-
-This Monorepo includes the following packages and apps:
-
-### Apps
-
-- **`api`** - Rust backend API (Axum + SQLx)
-- **`dashboard`** - Admin dashboard (TanStack Router + React)
-- **`docs`** - Documentation site (Next.js + Fumadocs)
-- **`web`** - Premium landing page (Next.js + React Three Fiber)
-
-### Packages
-
-- **`@repo/api-types`** - Auto-generated TS types from the Rust API
-- **`@repo/i18n`** - Shared internationalization configuration and UI components
-- **`@repo/ui`** - Shared React component library
-- **`@repo/eslint-config`** - Shared ESLint configurations
-- **`@repo/tailwind-config`** - Shared Tailwind CSS theme
-- **`@repo/typescript-config`** - Shared TypeScript configurations
-
-### Tools & Configuration
-
-- **TypeScript** - Static type checking across all packages
-- **ESLint** - Code linting with custom rules
-- **Prettier** - Code formatting
-- **Husky** - Git hooks for code quality
-- **Commitlint** - Conventional commit message linting
-- **Tailwind CSS** - Utility-first styling
-- **Rust/Cargo** - Backend language and package manager
-- **Docker** - Containerization support
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js** 22+
-- **pnpm** (recommended package manager)
-- **Git**
-
-### Installation
-
-1. **Use this template** (Recommended)
-   Click the **"Use this template"** button at the top of the GitHub repository to create your own copy and start building immediately.
-
-2. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/dzikrisyairozi/monorepo-fullstack-starter.git
-   cd monorepo-fullstack-starter
-   ```
-
-3. **Install dependencies**
-
-   ```bash
-   pnpm install
-   ```
-
-4. **Set up environment variables**
-
-   ```bash
-   # Copy environment files
-   cp apps/api/.env.example apps/api/.env
-   # Make sure to update your DATABASE_URL in apps/api/.env
-   ```
-
-5. **Set up the database** (if using the API)
-   ```bash
-   cd apps/api
-   cargo sqlx database setup
-   cd ../..
-   ```
-
-### Development
-
-**Start all applications:**
+## Commands
 
 ```bash
-pnpm dev
+pnpm install
+pnpm dev              # dev server at http://localhost:4321
+pnpm build            # static build to dist/
+pnpm preview          # serve dist/ at http://localhost:4321
+pnpm type-check       # astro check
+pnpm lint             # ESLint
+pnpm format           # Prettier, write
+pnpm format:check     # Prettier, check
+pnpm test             # unit tests (Node's test runner)
+pnpm test:e2e         # Playwright, in Chromium and WebKit
+pnpm lhci             # Lighthouse CI against dist/
+pnpm check-all        # type-check, lint, format:check and test
 ```
 
-**Start specific applications:**
+`pnpm test:e2e` needs Playwright's browsers once per machine:
 
 ```bash
-# Frontend only
-pnpm dev:web
-
-# Dashboard only
-pnpm dev:dashboard
-
-# Backend only
-pnpm dev:api
-
-# Documentation
-pnpm dev:docs
+pnpm exec playwright install chromium webkit
 ```
 
-**Access your applications:**
+## Project structure
 
-- 🌐 **Web App**: http://localhost:3000
-- 🔧 **API**: http://localhost:3001
-- 📚 **Docs**: http://localhost:3002
-- 📊 **Dashboard**: http://localhost:5174
-
-### Build
-
-**Build all packages:**
-
-```bash
-pnpm build
+```
+astro.config.ts      site URL and integrations
+public/              files served as they are: _redirects, robots.txt, favicon.svg
+src/pages/           one file per route
+src/layouts/         Site.astro, the document shell
+src/components/      Astro components
+src/lib/             pure TypeScript, each module with a *.test.ts next to it
+src/scripts/         browser code, imported from a component's <script>
+src/styles/          tokens.css (design tokens) and global.css
+src/content/         Markdown for the docs and the blog
+src/assets/demo/     one real recdr recording, shown on the landing page
+demo/                the page that was recorded, and the script that records it
+e2e/                 Playwright tests
+spec/                the spec this site is built from
 ```
 
-**Build specific packages:**
+## Deployment
 
-```bash
-pnpm build --filter=web
-pnpm build --filter=dashboard
-pnpm build --filter=api
-pnpm build --filter=docs
-```
+Cloudflare Pages builds the `main` branch and gives every pull request from
+this repository a preview URL.
 
-## 🧩 Component Library
+| Setting          | Value                                              |
+| ---------------- | -------------------------------------------------- |
+| Build command    | `pnpm build`                                       |
+| Output directory | `dist`                                             |
+| `PNPM_VERSION`   | `9.6.0` (the build image's own pnpm is version 10) |
+| `GITHUB_TOKEN`   | optional; raises the GitHub API limit at build     |
 
-The `@repo/ui` package includes 40+ pre-built components from shadcn/ui:
+Node comes from `.node-version`. The redirect rules are in `public/_redirects`.
+A build without network access still passes: the changelog then links to the
+releases on GitHub.
 
-### Layout Components
+## Contributing
 
-- **Card** - Flexible content containers
-- **Separator** - Visual dividers
-- **Aspect Ratio** - Maintain aspect ratios
-- **Container** - Responsive containers
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-### Form Components
+## License
 
-- **Button** - Various button styles and sizes
-- **Input** - Text inputs with validation
-- **Textarea** - Multi-line text inputs
-- **Select** - Dropdown selections
-- **Checkbox** - Boolean inputs
-- **Radio Group** - Single selection from options
-- **Switch** - Toggle switches
-- **Slider** - Range inputs
-
-### Navigation
-
-- **Navigation Menu** - Complex navigation structures
-- **Breadcrumb** - Hierarchical navigation
-- **Pagination** - Page navigation
-- **Menubar** - Application menus
-
-### Feedback
-
-- **Alert** - Important messages
-- **Toast** - Temporary notifications
-- **Progress** - Loading indicators
-- **Skeleton** - Loading placeholders
-
-### Overlay
-
-- **Dialog** - Modal dialogs
-- **Drawer** - Slide-out panels
-- **Popover** - Contextual overlays
-- **Tooltip** - Helpful hints
-- **Sheet** - Side panels
-- **Hover Card** - Rich hover content
-
-### Data Display
-
-- **Table** - Data tables
-- **Badge** - Status indicators
-- **Avatar** - User representations
-- **Calendar** - Date selection
-- **Chart** - Data visualizations
-
-## 🛠️ Development Scripts
-
-```bash
-# Development
-pnpm dev              # Start all apps in development
-pnpm dev:web          # Start web app only
-pnpm dev:dashboard    # Start dashboard only
-pnpm dev:api          # Start API only
-pnpm dev:docs         # Start docs only
-
-# Building
-pnpm build            # Build all packages
-pnpm build:web        # Build web app only
-pnpm build:dashboard  # Build dashboard only
-pnpm build:api        # Build API only
-pnpm build:docs       # Build docs only
-
-# Code Quality
-pnpm lint             # Lint all packages
-pnpm lint:fix         # Fix linting issues
-pnpm format           # Format code with Prettier
-pnpm type-check       # Run TypeScript checks
-
-# Testing
-pnpm test             # Run all tests
-pnpm test:watch       # Run tests in watch mode
-
-# Database (API)
-cd apps/api
-cargo sqlx database setup # Run migrations
-cargo sqlx prepare        # Prepare query metadata
-cd ../..
-```
-
-## 🐳 Docker Support
-
-Build and run with Docker:
-
-```bash
-# Build Docker image
-docker build -t monorepo-fullstack-starter .
-
-# Run container
-docker run -p 3000:3000 monorepo-fullstack-starter
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-**Web App (`apps/web/.env`)**
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
-
-**Database/API (`apps/api/.env`)**
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
-JWT_SECRET="your-jwt-secret"
-```
-
-### Customization
-
-- **Theme**: Modify `packages/tailwind-config/theme.css` for custom themes (if configured)
-- **Components**: Add new components to `packages/ui/src/`
-- **API Routes**: Add endpoints in `apps/api/src/`
-- **Database**: Update schema via migrations in `apps/api/migrations`
-
-## 🚢 Deployment
-
-### Vercel (Recommended for Frontend)
-
-1. **Connect your repository** to Vercel
-2. **Configure build settings**:
-   - Build Command: `pnpm build --filter=web`
-   - Output Directory: `apps/web/.next`
-3. **Set environment variables** in Vercel dashboard
-4. **Deploy** 🚀
-
-### Docker Deployment
-
-```bash
-# Build production image
-docker build -t turborepo-starter .
-
-# Run in production
-docker run -p 3000:3000 -e NODE_ENV=production turborepo-starter
-```
-
-### Railway/Render (API)
-
-1. **Connect your repository**
-2. **Environment**: Select Rust
-3. **Set build command**: `cargo build --release`
-4. **Set start command**: `./target/release/api`
-5. **Configure environment variables**
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Quick Contribution Steps
-
-1. **Fork the repository**
-2. **Create a feature branch from `staging`**: `git checkout -b feat/amazing-feature staging`
-3. **Make your changes**
-4. **Run tests**: `pnpm test`
-5. **Commit**: `git commit -m "feat: add amazing feature"`
-6. **Push**: `git push origin feat/amazing-feature`
-7. **Open a Pull Request into `staging`**
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Turborepo](https://turborepo.com/) - The build system that powers this monorepo
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful and accessible UI components
-- [Axum](https://github.com/tokio-rs/axum) - A fast, ergonomic, and modular web framework for Rust
-- [SQLx](https://github.com/launchbadge/sqlx) - The Rust SQL Toolkit
-- [TanStack Router](https://tanstack.com/router) - Fully type-safe routing for React
-- [Fumadocs](https://fumadocs.com/) - The beautiful documentation framework
-- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework
-
-## 📚 Learn More
-
-### Documentation
-
-- [Turborepo Docs](https://turborepo.com/docs)
-- [Next.js Docs](https://nextjs.org/docs)
-- [Vite Docs](https://vitejs.dev/guide/)
-- [Actix-Web Docs](https://actix.rs/docs/)
-- [shadcn/ui Docs](https://ui.shadcn.com/)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-
-### Turborepo Features
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-
----
-
-<div align="center">
-
-**[⭐ Star this repo](https://github.com/dzikrisyairozi/monorepo-fullstack-starter)** • **[🐛 Report Bug](https://github.com/dzikrisyairozi/monorepo-fullstack-starter/issues)** • **[✨ Request Feature](https://github.com/dzikrisyairozi/monorepo-fullstack-starter/issues)**
-
-Made with ❤️ by @dzikrisyairozi
-
-</div>
+MIT. See [LICENSE](LICENSE).
