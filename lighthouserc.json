@@ -28,10 +28,6 @@
           { "maxNumericValue": 2500, "aggregationMethod": "median" }
         ]
       }
-    },
-    "upload": {
-      "target": "filesystem",
-      "outputDir": "./.lighthouseci"
     }
   }
 }

@@ -11,9 +11,6 @@ concurrency:
   group: ci-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-env:
-  NODE_VERSION: '24'
-
 jobs:
   ci:
     name: CI
@@ -33,7 +30,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .node-version
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -41,12 +38,6 @@ jobs:
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium webkit
-
-      # The token raises the GitHub API limit for the changelog and star count.
-      - name: Build
-        run: pnpm build
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Type check
         run: pnpm type-check
@@ -60,7 +51,8 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
-      # Playwright builds the site again before it starts the preview server.
+      # Playwright builds the site before it starts the preview server. The
+      # token raises the GitHub API limit for the changelog and star count.
       - name: Browser tests
         run: pnpm test:e2e
         env:

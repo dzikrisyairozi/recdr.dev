@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { installCommands } from '../src/lib/install.ts';
-import { trackErrors } from './helpers.ts';
 
 declare global {
   interface Window {
@@ -10,7 +9,14 @@ declare global {
 }
 
 test('the home page renders without errors', async ({ page }) => {
-  const errors = trackErrors(page);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+  });
+  page.on('requestfailed', (request) =>
+    errors.push(`requestfailed: ${request.url()}`),
+  );
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Screen recorder your agent can use.',
