@@ -103,3 +103,20 @@ test.describe('on a phone', () => {
     await expect(link).toBeVisible();
   });
 });
+
+test('the landing page links into the docs from its body', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/');
+  for (const href of [
+    '/docs/install/',
+    '/docs/guides/mcp/',
+    '/docs/reference/output-files/',
+    '/docs/guides/macos-permissions/',
+    '/docs/reference/limits/',
+  ]) {
+    await expect(page.locator(`main a[href="${href}"]`)).toHaveCount(1);
+    expect((await request.get(href)).status()).toBe(200);
+  }
+});
