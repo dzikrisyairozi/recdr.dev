@@ -1,10 +1,7 @@
 ---
 // Rendered inside <header> by Site.astro, and inside Starlight's own
 // <header> on docs pages, so it styles itself and brings no wrapper element.
-const links: { href: string; label: string }[] = [
-  { href: '/docs/', label: 'Docs' },
-  { href: 'https://github.com/dzikrisyairozi/recdr', label: 'GitHub' },
-];
+import { siteLinks as links } from '../lib/site-links.ts';
 ---
 
 <div class="bar">

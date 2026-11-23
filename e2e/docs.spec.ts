@@ -102,6 +102,21 @@ test.describe('on a phone', () => {
     await page.getByRole('button', { name: 'Menu' }).click();
     await expect(link).toBeVisible();
   });
+
+  test('the menu also holds the links of the site header', async ({ page }) => {
+    await page.goto('/docs/install/');
+    // The header has no room for them at this width.
+    const inMenu = page
+      .locator('#starlight__sidebar')
+      .getByRole('link', { name: 'GitHub' });
+    await expect(inMenu).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(inMenu).toBeVisible();
+    await expect(inMenu).toHaveAttribute(
+      'href',
+      'https://github.com/dzikrisyairozi/recdr',
+    );
+  });
 });
 
 test('the landing page links into the docs from its body', async ({

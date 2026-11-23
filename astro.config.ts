@@ -10,6 +10,9 @@ export default defineConfig({
       title: 'recdr',
       // src/pages/404.astro is the 404 page of the whole site.
       disable404Route: true,
+      editLink: {
+        baseUrl: 'https://github.com/dzikrisyairozi/recdr.dev/edit/main/',
+      },
       customCss: [
         '@fontsource-variable/geist',
         '@fontsource-variable/geist-mono',
@@ -19,6 +22,7 @@ export default defineConfig({
       components: {
         Header: './src/components/starlight/Header.astro',
         Footer: './src/components/starlight/Footer.astro',
+        MobileMenuFooter: './src/components/starlight/MobileMenuFooter.astro',
         ThemeProvider: './src/components/starlight/ThemeProvider.astro',
         ThemeSelect: './src/components/starlight/ThemeSelect.astro',
       },
