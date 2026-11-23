@@ -49,7 +49,17 @@ test('the sections follow the hero in order', async ({ page }) => {
   const ids = await page
     .locator('main > section')
     .evaluateAll((sections) => sections.map((section) => section.id));
-  expect(ids).toEqual(['top', 'why', 'how', 'frames', 'files', 'agents']);
+  expect(ids).toEqual([
+    'top',
+    'why',
+    'how',
+    'frames',
+    'files',
+    'agents',
+    'platforms',
+    'faq',
+    'install',
+  ]);
 });
 
 test('a section heading is revealed when it scrolls into view', async ({
@@ -126,4 +136,33 @@ test('the chat in #agents shows every item once it is in view', async ({
   await expect(items.last()).toContainText(
     /appears at \d\.\ds and is gone by \d\.\ds\./,
   );
+});
+
+test('the platform table says what runs where', async ({ page }) => {
+  await page.goto('/');
+  const table = page.locator('#platforms table');
+  await expect(table.locator('caption')).toHaveText(
+    'What recdr records on each system',
+  );
+  const row = table.getByRole('row', { name: /^Browser tab/ });
+  await expect(row.getByRole('cell')).toHaveText(['Yes', 'Yes', 'Yes']);
+});
+
+test('the FAQ has eight questions with their answers showing', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const faq = page.locator('#faq');
+  await expect(faq.getByRole('heading', { level: 3 })).toHaveCount(8);
+  await expect(
+    faq.getByText('No. recdr never uploads anything.'),
+  ).toBeVisible();
+});
+
+test('the header Install link leads to the install section', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('#install [data-install]')).toBeVisible();
+  await expect(page.locator('#install')).toContainText('MIT license');
 });
