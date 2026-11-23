@@ -120,3 +120,28 @@ test('the landing page links into the docs from its body', async ({
     expect((await request.get(href)).status()).toBe(200);
   }
 });
+
+test('the site footer is left out of the docs search index', async ({
+  page,
+}) => {
+  await page.goto('/docs/install/');
+  await expect(page.locator('.site-footer')).toHaveAttribute(
+    'data-pagefind-ignore',
+  );
+});
+
+test('the docs home page has its own title and description', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const landing = await page
+    .locator('meta[name="description"]')
+    .getAttribute('content');
+  await page.goto('/docs/');
+  await expect(page).toHaveTitle('Documentation | recdr');
+  await expect(page.locator('meta[name="description"]')).not.toHaveAttribute(
+    'content',
+    landing ?? '',
+  );
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('recdr');
+});

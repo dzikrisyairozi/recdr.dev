@@ -1,6 +1,10 @@
 ---
 title: 'recdr'
-description: 'recdr records a window, a screen region, a monitor or a browser tab, and leaves files an AI agent can read.'
+description: 'The recdr documentation: how to install it, a quick start, guides for browser tabs, exporting and the MCP server, and the reference for commands and files.'
+# The heading stays "recdr". Without this the tab would read "recdr | recdr".
+head:
+  - tag: title
+    content: 'Documentation | recdr'
 sidebar:
   order: 1
 ---
