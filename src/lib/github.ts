@@ -2,7 +2,6 @@ export const REPO = 'dzikrisyairozi/recdr';
 
 export type Release = {
   tag: string;
-  title: string;
   /** When it was published, as GitHub's ISO 8601 string. */
   date: string;
   url: string;
@@ -82,10 +81,6 @@ function toRelease(entry: unknown): Release {
   }
   return {
     tag: entry.tag_name,
-    title:
-      typeof entry.name === 'string' && entry.name
-        ? entry.name
-        : entry.tag_name,
     date: entry.published_at,
     url: entry.html_url,
     prerelease: entry.prerelease === true,

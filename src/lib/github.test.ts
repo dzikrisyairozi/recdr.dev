@@ -62,7 +62,6 @@ test('fetchReleases drops drafts, maps the fields and sorts newest first', async
   assert.deepEqual(await fetchReleases(fetchFn), [
     {
       tag: 'v0.2.0-rc.1',
-      title: 'v0.2.0-rc.1',
       date: '2026-11-22T10:00:00Z',
       url: 'https://github.com/dzikrisyairozi/recdr/releases/tag/v0.2.0-rc.1',
       prerelease: true,
@@ -70,7 +69,6 @@ test('fetchReleases drops drafts, maps the fields and sorts newest first', async
     },
     {
       tag: 'v0.1.0',
-      title: 'recdr 0.1.0',
       date: '2026-11-20T10:00:00Z',
       url: 'https://github.com/dzikrisyairozi/recdr/releases/tag/v0.1.0',
       prerelease: false,

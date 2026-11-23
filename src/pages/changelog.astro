@@ -1,9 +1,8 @@
 ---
 import Site from '../layouts/Site.astro';
-import { REPO } from '../lib/github.ts';
-import { getReleases } from '../lib/site-data.ts';
+import { fetchReleases, REPO } from '../lib/github.ts';
 
-const releases = await getReleases();
+const releases = await fetchReleases(fetch, process.env.GITHUB_TOKEN);
 const releasesUrl = `https://github.com/${REPO}/releases`;
 ---
 
