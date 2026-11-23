@@ -49,7 +49,7 @@ test('the sections follow the hero in order', async ({ page }) => {
   const ids = await page
     .locator('main > section')
     .evaluateAll((sections) => sections.map((section) => section.id));
-  expect(ids).toEqual(['top', 'why', 'how', 'frames', 'files']);
+  expect(ids).toEqual(['top', 'why', 'how', 'frames', 'files', 'agents']);
 });
 
 test('a section heading is revealed when it scrolls into view', async ({
@@ -107,4 +107,23 @@ test('#files shows the six kinds of file a recording leaves', async ({
     'result.json',
   ]);
   await expect(files.locator('pre').last()).toContainText('"stop_reason"');
+});
+
+test('the chat in #agents shows every item once it is in view', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const items = page.locator('#agents [data-chat] > li');
+  await expect(items).toHaveCount(7);
+  await page.locator('#agents [data-chat]').scrollIntoViewIfNeeded();
+  // The items come in one at a time, 600 ms apart.
+  for (const item of await items.all()) {
+    await expect(item).toBeVisible({ timeout: 8000 });
+  }
+  await expect(page.locator('#agents')).toContainText(
+    'claude mcp add recdr -- /path/to/recdr mcp',
+  );
+  await expect(items.last()).toContainText(
+    /appears at \d\.\ds and is gone by \d\.\ds\./,
+  );
 });

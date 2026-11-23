@@ -34,8 +34,13 @@ It stops with an error when the recording has no click, or when `result.json`
 holds a path with your user name in it (the landing page shows that file, so
 keep the repository outside your home folder when you record).
 
-Frame count and timings differ a little between runs. Run `pnpm test` and
-`pnpm test:e2e` after recording again.
+Frame count and timings differ a little between runs. After recording again:
+
+- run `pnpm test` and `pnpm test:e2e`
+- open `src/assets/demo/contact_sheet.png` and set `toastArrives` and
+  `toastGone` in `src/components/AgentsSection.astro` to the labels of the
+  tile where the toast starts to show and the tile after it has left
+- update the table below
 
 ## The committed recording
 
