@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import { contactSheet, frames } from '../lib/demo-assets.ts';
+
+const lastFrame = frames.at(-1)!;
+---
+
+<section id="why" class="section" data-scene="why">
+  <div data-pin>
+    <h2 class="section-title" data-reveal>
+      One screenshot misses what happened
+    </h2>
+    <div class="figures">
+      <figure data-why-before>
+        <Image
+          src={lastFrame.image}
+          width={960}
+          alt="The checkout page after the payment. The button reads Paid and nothing else is on the page."
+          loading="lazy"
+        />
+        <figcaption>
+          A screenshot taken after the click. The page looks finished.
+        </figcaption>
+      </figure>
+      <figure data-why-after>
+        <Image
+          src={contactSheet}
+          width={1216}
+          alt="The contact sheet of the recording: a grid of the moments the page changed, with the toast Payment accepted in some of them."
+          loading="lazy"
+        />
+        <figcaption>
+          The contact sheet of the same six seconds. The toast that appeared and
+          went is on it.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .figures {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  figure {
+    margin: 0;
+    /* opaque, because in the pinned scene one figure covers the other */
+    background: var(--bg);
+  }
+
+  figure :global(img) {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .figures {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  /* The pinned scene (scroll-scenes.ts) puts both figures in one cell and
+     wipes the contact sheet in over the screenshot. The width comes from the
+     viewport height, so the taller figure fits on one screen. */
+  section[data-scene-active] .figures {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: min(100%, calc((100svh - 20rem) * 1.49));
+    margin-inline: auto;
+  }
+
+  section[data-scene-active] figure {
+    grid-area: 1 / 1;
+  }
+</style>

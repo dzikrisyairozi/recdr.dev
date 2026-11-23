@@ -35,3 +35,21 @@ test('the right arrow key moves the scrubber to the next frame', async ({
     page.locator('[data-scrub-strip] button').nth(1),
   ).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('the sections follow the hero in order', async ({ page }) => {
+  await page.goto('/');
+  const ids = await page
+    .locator('main > section')
+    .evaluateAll((sections) => sections.map((section) => section.id));
+  expect(ids).toEqual(['top', 'why', 'how', 'frames']);
+});
+
+test('a section heading is revealed when it scrolls into view', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const heading = page.locator('#how h2');
+  await expect(heading).not.toHaveAttribute('data-revealed');
+  await heading.scrollIntoViewIfNeeded();
+  await expect(heading).toHaveAttribute('data-revealed');
+});

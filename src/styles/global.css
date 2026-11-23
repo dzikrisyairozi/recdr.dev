@@ -83,3 +83,15 @@ video {
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
+
+/* reveal.ts sets reveal-ready, then data-revealed on each element it sees. */
+.reveal-ready [data-reveal] {
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
+}
+
+.reveal-ready [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(1rem);
+}

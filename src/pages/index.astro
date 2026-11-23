@@ -1,6 +1,8 @@
 ---
 import FrameScrubber from '../components/FrameScrubber.astro';
 import Hero from '../components/Hero.astro';
+import HowSection from '../components/HowSection.astro';
+import WhySection from '../components/WhySection.astro';
 import Site from '../layouts/Site.astro';
 ---
 
@@ -9,5 +11,13 @@ import Site from '../layouts/Site.astro';
   description="recdr records a window, a screen region, a monitor or a Chrome tab, and leaves files an AI agent can read."
 >
   <Hero />
+  <WhySection />
+  <HowSection />
   <FrameScrubber />
 </Site>
+
+<script>
+  import { initReveals } from '../scripts/reveal.ts';
+
+  initReveals();
+</script>
