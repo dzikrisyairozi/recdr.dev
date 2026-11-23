@@ -1,13 +1,10 @@
-name: CI/CD Pipeline
+name: CI
 
-# PRs only -- a merged PR already passed here, so push-to-branch runs were
-# pure duplicates. Feature PRs target staging; staging -> main is the
-# release PR. Tags don't run CI: release.yml ships what main verified.
+# Runs on pull requests to main.
 on:
   pull_request:
-    branches: [staging, main]
+    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
-    paths-ignore: ['**.md', 'docs/**']
   workflow_dispatch:
 
 concurrency:
@@ -16,26 +13,21 @@ concurrency:
 
 env:
   NODE_VERSION: '24'
-  PNPM_VERSION: '9.0.0'
-  TURBO_TELEMETRY_DISABLED: 1
 
 jobs:
-  # Single comprehensive job with all checks
   ci:
-    name: CI/CD Pipeline
+    name: CI
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
+      # Reads the pnpm version from "packageManager" in package.json.
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Setup Node.js
@@ -45,26 +37,34 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
-      - name: Update lockfile if needed
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            echo "Lockfile exists, checking compatibility..."
-            pnpm install --lockfile-only
-          fi
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
 
-      - name: Build packages
-        run: pnpm run build
+      # The token raises the GitHub API limit for the changelog and star count.
+      - name: Build
+        run: pnpm build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Type checking
-        run: pnpm run type-check
+      - name: Type check
+        run: pnpm type-check
 
-      - name: Lint check
-        run: pnpm run lint:check
+      - name: Lint
+        run: pnpm lint
 
       - name: Format check
-        run: pnpm run format:check
+        run: pnpm format:check
 
-      - name: Run unit tests
-        run: pnpm run test
+      - name: Unit tests
+        run: pnpm test
+
+      # Playwright builds the site again before it starts the preview server.
+      - name: Browser tests
+        run: pnpm test:e2e
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Lighthouse
+        run: pnpm lhci
