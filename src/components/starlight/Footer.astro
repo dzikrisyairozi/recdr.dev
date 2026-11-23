@@ -1,0 +1,21 @@
+---
+// Starlight's footer holds the previous and next page links, so it stays,
+// with the site's footer under it.
+// data-pagefind-ignore keeps the footer's words out of the search index;
+// they are on every docs page.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import FooterContent from '../FooterContent.astro';
+---
+
+<Default />
+<div class="site-footer" data-pagefind-ignore>
+  <FooterContent />
+</div>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border);
+  }
+</style>

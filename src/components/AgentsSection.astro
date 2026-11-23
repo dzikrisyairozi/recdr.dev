@@ -62,6 +62,9 @@ const agentReply = `The toast "Payment accepted" appears at ${toastArrives} and 
     <div class="setup">
       <p>Works with Claude Code, and any MCP client or shell.</p>
       <pre tabindex="0"><code>claude mcp add recdr -- /path/to/recdr mcp</code></pre>
+      <p class="more">
+        <a href="/docs/guides/mcp/">The MCP server and its ten tools</a>
+      </p>
     </div>
   </div>
 </section>
@@ -184,6 +187,11 @@ const agentReply = `The toast "Payment accepted" appears at ${toastArrives} and 
   .setup p {
     margin-bottom: var(--space-4);
     font-size: var(--text-lg);
+  }
+
+  .setup .more {
+    margin: var(--space-4) 0 0;
+    font-size: inherit;
   }
 
   pre {

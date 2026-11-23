@@ -1,0 +1,34 @@
+/* Maps Starlight's theme variables to the site's tokens. The docs are dark
+   only, so the :root values apply to every page. */
+:root {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-nav-height: var(--header-height);
+
+  --sl-color-black: var(--bg);
+  --sl-color-bg: var(--bg);
+  --sl-color-bg-nav: var(--bg);
+  --sl-color-bg-sidebar: var(--bg);
+  --sl-color-gray-6: var(--surface);
+  --sl-color-gray-5: var(--border);
+  --sl-color-gray-3: var(--text-muted);
+  --sl-color-gray-2: var(--text);
+  --sl-color-white: var(--text);
+  --sl-color-accent: var(--rec);
+  --sl-color-accent-high: var(--text);
+  --sl-color-accent-low: var(--surface-2);
+}
+
+.sl-markdown-content a:hover {
+  color: var(--rec);
+}
+
+/* A long value in a table cell, such as a URL, breaks so that it does not
+   squeeze the other columns. The first column holds names, which stay whole. */
+.sl-markdown-content td code {
+  overflow-wrap: anywhere;
+}
+
+.sl-markdown-content td:first-child code {
+  white-space: nowrap;
+}

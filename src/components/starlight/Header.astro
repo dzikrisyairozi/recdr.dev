@@ -1,0 +1,31 @@
+---
+// Replaces Starlight's header with the site's, and keeps Starlight's search.
+import Search from '@astrojs/starlight/components/Search.astro';
+import HeaderContent from '../HeaderContent.astro';
+---
+
+<div class="docs-header">
+  <HeaderContent>
+    <Search slot="search" />
+  </HeaderContent>
+</div>
+
+<style>
+  .docs-header {
+    width: 100%;
+  }
+
+  /* Below 50rem Starlight puts its own menu button at the right edge. It
+     opens the sidebar, which lists the docs pages and, at its end, the
+     site's links (MobileMenuFooter.astro). So the site's Menu is hidden
+     there and its place is left free. */
+  @media (max-width: 49.99rem) {
+    .docs-header {
+      padding-inline-end: 3.25rem;
+    }
+
+    .docs-header :global(details.menu) {
+      display: none;
+    }
+  }
+</style>

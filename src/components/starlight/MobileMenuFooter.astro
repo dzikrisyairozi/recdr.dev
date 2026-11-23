@@ -1,0 +1,34 @@
+---
+// Starlight shows this at the end of the menu a phone opens. Its own version
+// holds the theme and language pickers, which this site does not have. Here
+// it holds the header's links, which Header.astro hides at that width.
+import { siteLinks } from '../../lib/site-links.ts';
+---
+
+<ul>
+  {siteLinks.map((link) => (
+    <li>
+      <a href={link.href}>{link.label}</a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  ul {
+    margin: 0;
+    padding: var(--space-4) 0 0;
+    border-top: 1px solid var(--border);
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding-block: var(--space-2);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--rec);
+  }
+</style>

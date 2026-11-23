@@ -1,0 +1,12 @@
+---
+// Starlight's head, plus the two fonts of a docs page fetched early. Without
+// the preload they arrive after the first paint, the text wraps again in the
+// new font, and the page's layout shift is measured over the limit.
+import Default from '@astrojs/starlight/components/Head.astro';
+import geist from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import geistMono from '@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url';
+---
+
+<Default />
+<link rel="preload" href={geist} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={geistMono} as="font" type="font/woff2" crossorigin />
