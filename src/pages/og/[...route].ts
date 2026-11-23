@@ -1,0 +1,48 @@
+import { getCollection } from 'astro:content';
+import { OGImageRoute } from 'astro-og-canvas';
+import { publishedPosts } from '../../lib/blog.ts';
+
+type Card = { title: string; description?: string };
+
+// The key is the page's path without its slashes, so /docs/install/ has its
+// card at /og/docs/install.png. Site.astro and route-data.ts build the same
+// key from the URL.
+const pages: Record<string, Card> = {
+  index: { title: 'Screen recorder your agent can use.' },
+  changelog: { title: 'Changelog' },
+  blog: { title: 'Blog' },
+};
+for (const entry of await getCollection('docs')) {
+  pages[entry.id] = entry.data;
+}
+for (const post of publishedPosts(await getCollection('blog'))) {
+  pages[`blog/${post.id}`] = post.data;
+}
+
+export const { getStaticPaths, GET } = await OGImageRoute({
+  pages,
+  getImageOptions: (_path, page) => ({
+    title: page.title,
+    description: page.description,
+    bgImage: { path: './src/assets/og/bg.png', fit: 'cover' },
+    logo: { path: './src/assets/og/logo.png', size: [96] },
+    padding: 72,
+    fonts: [
+      './src/assets/og/Geist-SemiBold.ttf',
+      './src/assets/og/GeistMono-Regular.ttf',
+    ],
+    font: {
+      title: {
+        size: 72,
+        families: ['Geist'],
+        weight: 'SemiBold',
+        color: [242, 243, 245],
+      },
+      description: {
+        size: 32,
+        families: ['Geist Mono'],
+        color: [155, 161, 173],
+      },
+    },
+  }),
+});

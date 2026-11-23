@@ -10,7 +10,10 @@ import FooterContent from '../components/FooterContent.astro';
 interface Props {
   title: string;
   description: string;
-  /** True on a page that search engines should not list, such as the 404 page. */
+  /**
+   * True on a page that search engines should not list, such as the 404
+   * page. Such a page has no canonical and no social card.
+   */
   noindex?: boolean;
   /**
    * schema.org data about the page, written to the head as JSON-LD. Each "<"
@@ -23,6 +26,9 @@ const { title, description, noindex = false, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // The home page's title already starts with the name.
 const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
+// src/pages/og/[...route].ts draws one card per page, named after its path.
+const cardKey = Astro.url.pathname.replace(/^\/|\/$/g, '') || 'index';
+const cardImage = new URL(`/og/${cardKey}.png`, Astro.site);
 ---
 
 <!doctype html>
@@ -52,6 +58,17 @@ const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
       title="recdr blog"
       href="/blog/rss.xml"
     />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {!noindex && (
+      <>
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={cardImage} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </>
+    )}
     <!-- The headline is set in Geist. Fetched early, the font is there for
          the first paint and the text does not reflow when it arrives. -->
     <link
