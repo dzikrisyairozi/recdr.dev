@@ -90,3 +90,26 @@ test('a post describes itself to search engines as a BlogPosting', async ({
     await page.locator('meta[name="description"]').getAttribute('content'),
   );
 });
+
+test('a post gives its date as a date, and its code at the size of the docs', async ({
+  page,
+}) => {
+  await page.goto('/blog/introducing-recdr/');
+  await expect(page.locator('article time')).toHaveAttribute(
+    'datetime',
+    '2026-11-23',
+  );
+  // 0.875rem, the size Expressive Code uses on a docs page.
+  await expect(page.locator('.prose pre code').first()).toHaveCSS(
+    'font-size',
+    '14px',
+  );
+});
+
+test('the feed names its own address and its language', async ({ request }) => {
+  const xml = await (await request.get('/blog/rss.xml')).text();
+  expect(xml).toContain(
+    '<atom:link href="https://recdr.dev/blog/rss.xml" rel="self" type="application/rss+xml"/>',
+  );
+  expect(xml).toContain('<language>en</language>');
+});

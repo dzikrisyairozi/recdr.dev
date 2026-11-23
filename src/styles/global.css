@@ -133,7 +133,8 @@ video {
   padding-inline-start: var(--space-6);
 }
 
-.prose code {
+/* Inline code only. A code block keeps the size its own styles give it. */
+.prose :not(pre) > code {
   color: var(--text);
   font-size: 0.9em;
 }

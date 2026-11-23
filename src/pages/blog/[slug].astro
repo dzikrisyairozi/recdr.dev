@@ -32,7 +32,7 @@ const jsonLd = {
   jsonLd={jsonLd}
 >
   <article class="page">
-    <time datetime={post.data.date.toISOString()}>
+    <time datetime={post.data.date.toISOString().slice(0, 10)}>
       {post.data.date.toISOString().slice(0, 10)}
     </time>
     <h1 class="page-title">{post.data.title}</h1>
