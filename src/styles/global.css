@@ -112,6 +112,12 @@ video {
   text-wrap: balance;
 }
 
+/* The date of a post or a release. */
+.page time {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
 /* HTML that comes from Markdown: a blog post, a release's notes. */
 .prose {
   color: var(--text-muted);
@@ -141,15 +147,11 @@ video {
 
 /* Starlight's Expressive Code draws the code blocks of every Markdown file,
    a post's too. It reads the colours of its box from Starlight's variables
-   on :root, which only a docs page defines, so they are given here. */
+   on :root, which only a docs page defines. tokens.css maps the ones the docs
+   set as well; the rest are given here. */
 :root {
-  --sl-color-black: var(--bg);
-  --sl-color-gray-5: var(--border);
-  --sl-color-gray-6: var(--surface);
   --sl-color-gray-7: var(--surface);
   --sl-color-text: var(--text);
-  --sl-color-accent: var(--rec);
-  --sl-color-accent-high: var(--text);
   --sl-text-code: var(--text-sm);
   --sl-line-height: 1.75;
 }

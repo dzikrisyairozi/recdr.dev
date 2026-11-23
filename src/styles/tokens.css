@@ -32,4 +32,12 @@
   --radius: 12px;
   --content-width: 76rem;
   --header-height: 4rem;
+
+  /* Starlight's names for five of the colours above. The docs read them,
+     and so do the code blocks of a blog post (Expressive Code). */
+  --sl-color-black: var(--bg);
+  --sl-color-gray-5: var(--border);
+  --sl-color-gray-6: var(--surface);
+  --sl-color-accent: var(--rec);
+  --sl-color-accent-high: var(--text);
 }
