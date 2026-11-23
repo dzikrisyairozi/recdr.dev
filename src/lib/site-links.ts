@@ -4,5 +4,6 @@ import { REPO } from './github.ts';
 export const siteLinks: { href: string; label: string }[] = [
   { href: '/docs/', label: 'Docs' },
   { href: '/changelog/', label: 'Changelog' },
+  { href: '/blog/', label: 'Blog' },
   { href: `https://github.com/${REPO}`, label: 'GitHub' },
 ];

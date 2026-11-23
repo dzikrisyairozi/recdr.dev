@@ -125,7 +125,7 @@ video {
   font-weight: 600;
 }
 
-.prose :is(p, ul, ol, pre) {
+.prose :is(p, ul, ol) {
   margin: 0 0 var(--space-4);
 }
 
@@ -138,11 +138,32 @@ video {
   font-size: 0.9em;
 }
 
-.prose pre {
+/* Starlight's Expressive Code draws the code blocks of every Markdown file,
+   a post's too. It reads the colours of its box from Starlight's variables
+   on :root, which only a docs page defines, so they are given here. */
+:root {
+  --sl-color-black: var(--bg);
+  --sl-color-gray-5: var(--border);
+  --sl-color-gray-6: var(--surface);
+  --sl-color-gray-7: var(--surface);
+  --sl-color-text: var(--text);
+  --sl-color-accent: var(--rec);
+  --sl-color-accent-high: var(--text);
+  --sl-text-code: var(--text-sm);
+  --sl-line-height: 1.75;
+}
+
+.prose .expressive-code {
+  margin-bottom: var(--space-4);
+}
+
+/* Release notes from GitHub. Code blocks in a post are drawn by Expressive
+   Code, which styles its own <pre>. */
+.prose pre:not(.expressive-code pre) {
+  margin: 0 0 var(--space-4);
   padding: var(--space-4);
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  /* Astro's highlighter sets its own background inline. */
-  background: var(--surface) !important;
+  background: var(--surface);
 }
