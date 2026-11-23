@@ -53,7 +53,9 @@ export function buildFrames(manifest: Manifest, diff: Diff): FrameView[] {
       index: frame.index,
       file: frame.file,
       label: frame.file.replace(/^.*\//, '').replace(/\.png$/, ''),
-      timecode: formatTimecode(frame.t_ms),
+      // Rounded to the nearest tenth, the way recdr labels the tiles of its
+      // contact sheet. formatTimecode rounds down, which suits a running clock.
+      timecode: formatTimecode(Math.round(frame.t_ms / 100) * 100),
       changed: formatChanged(change.changed_fraction),
       keyframe: change.keyframe,
       box: box

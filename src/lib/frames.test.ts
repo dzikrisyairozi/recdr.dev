@@ -59,7 +59,7 @@ test('buildFrames joins the manifest and the change log by position', () => {
     index: 2,
     file: 'frames/000002.png',
     label: '000002',
-    timecode: '00:00.0',
+    timecode: '00:00.1',
     changed: '1.7%',
     keyframe: false,
     box: { x: 0, y: 41.7, width: 17.5, height: 16.7 },
