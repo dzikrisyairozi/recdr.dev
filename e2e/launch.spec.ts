@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const cardPages = ['/', '/blog/', '/changelog/', '/blog/introducing-recdr/'];
+const cardPages = [
+  '/',
+  '/docs/install/',
+  '/blog/',
+  '/changelog/',
+  '/blog/introducing-recdr/',
+];
 
 for (const path of cardPages) {
   test(`the social card of ${path} is a 1200 by 630 PNG`, async ({
@@ -32,3 +38,23 @@ test('the 404 page has no social card', async ({ page }) => {
   await page.goto('/nowhere/');
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(0);
 });
+
+test('the sitemap exists and robots.txt names it', async ({ request }) => {
+  expect((await request.get('/sitemap-index.xml')).status()).toBe(200);
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toContain('Sitemap: https://recdr.dev/sitemap-index.xml');
+});
+
+for (const path of ['/', '/docs/install/']) {
+  test(`${path} loads no script from another site`, async ({ page }) => {
+    await page.goto(path);
+    const sources = await page
+      .locator('script[src]')
+      .evaluateAll((scripts) =>
+        scripts.map((script) => (script as HTMLScriptElement).src),
+      );
+    for (const source of sources) {
+      expect(new URL(source).origin).toBe(new URL(page.url()).origin);
+    }
+  });
+}
