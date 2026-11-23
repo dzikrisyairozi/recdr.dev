@@ -49,8 +49,8 @@ those majors regardless of what the weekly group would otherwise bundle.
 
 ## Update, November 2026
 
-The template this repository started from was replaced by one Astro site
-(`spec/1-recdr-dev-site/spec.md`), and the two pins were looked at again.
+The template this repository started from was replaced by one Astro site,
+and the two pins were looked at again.
 
 - **ESLint.** The pin existed for `eslint-plugin-react`, which came in through
   `eslint-config-next`. Both left with the template. `eslint-plugin-astro` 3

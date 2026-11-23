@@ -12,4 +12,3 @@ playwright-report/
 # recdr's own output, kept byte for byte
 src/assets/demo/
 
-spec/**/evidence/

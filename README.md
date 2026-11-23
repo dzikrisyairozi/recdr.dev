@@ -10,8 +10,7 @@ The site is a static Astro 7 build with no server. It serves:
 - `/install.sh` and `/install.ps1`, which redirect to the install scripts of
   the latest recdr release, so the install commands in the recdr README work
 - the home page
-- the docs, the changelog and the blog, as the modules in
-  [the spec](spec/1-recdr-dev-site/spec.md) land
+- the docs, the changelog and the blog, which are added one module at a time
 
 ## Requirements
 
@@ -56,7 +55,6 @@ src/content/         Markdown for the docs and the blog
 src/assets/demo/     one real recdr recording, shown on the landing page
 demo/                the page that was recorded, and the script that records it
 e2e/                 Playwright tests
-spec/                the spec this site is built from
 ```
 
 ## Deployment

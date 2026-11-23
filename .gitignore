@@ -12,5 +12,6 @@ playwright-report/
 .lighthouseci/
 .recdr/
 
-# Per-feature task lists and build evidence; the spec in spec/ is tracked.
+# Specs, task lists and build evidence stay on the author's machine.
+/spec/
 /tasks/

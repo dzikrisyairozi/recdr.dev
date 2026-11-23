@@ -296,8 +296,9 @@ Before the first `pnpm test:e2e` on a machine:
 ### Architecture
 
 One static Astro 7 site for recdr.dev, deployed to Cloudflare Pages. There is
-no server, no database and no workspace package. The spec is
-`spec/1-recdr-dev-site/spec.md`.
+no server, no database and no workspace package. The spec,
+`spec/1-recdr-dev-site/spec.md`, is not in the repository: `spec/` and
+`tasks/` are git-ignored and exist only on the author's machine.
 
 | Path                     | Purpose                                                 |
 | ------------------------ | ------------------------------------------------------- |
