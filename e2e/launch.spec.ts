@@ -1,38 +1,50 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 
-const cardPages = [
-  '/',
-  '/docs/install/',
-  '/blog/',
-  '/changelog/',
-  '/blog/introducing-recdr/',
-];
+/** The path of every page the sitemap lists. */
+async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
+  const xml = await (await request.get('/sitemap-0.xml')).text();
+  return [...xml.matchAll(/<loc>https:\/\/recdr\.dev([^<]+)<\/loc>/g)].map(
+    (match) => match[1]!,
+  );
+}
 
-for (const path of cardPages) {
-  test(`the social card of ${path} is a 1200 by 630 PNG`, async ({
-    page,
-    request,
-  }) => {
-    await page.goto(path);
-    const image = await page
-      .locator('meta[property="og:image"]')
-      .getAttribute('content');
-    expect(image).toMatch(/^https:\/\/recdr\.dev\/og\/.+\.png$/);
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
-      'content',
-      'summary_large_image',
+/** The content of a <meta property="..."> tag in a page's HTML. */
+function meta(html: string, property: string): string | undefined {
+  return html.match(
+    new RegExp(`<meta property="${property}" content="([^"]*)"`),
+  )?.[1];
+}
+
+test('every page in the sitemap has a 1200 by 630 PNG as its social card', async ({
+  request,
+}) => {
+  const paths = await sitemapPaths(request);
+  // The landing page, the changelog, the blog and its post, and 14 docs pages.
+  expect(paths.length).toBeGreaterThanOrEqual(18);
+
+  for (const path of paths) {
+    const html = await (await request.get(path)).text();
+    const image = meta(html, 'og:image');
+    expect(image, path).toMatch(/^https:\/\/recdr\.dev\/og\/.+\.png$/);
+    expect(meta(html, 'og:image:type'), path).toBe('image/png');
+    expect(meta(html, 'og:image:width'), path).toBe('1200');
+    expect(meta(html, 'og:image:height'), path).toBe('630');
+    expect(meta(html, 'og:image:alt'), path).toBeTruthy();
+    expect(meta(html, 'og:site_name'), path).toBe('recdr');
+    expect(html, path).toContain(
+      '<meta name="twitter:card" content="summary_large_image"',
     );
 
     // The tag names the live site; the file is checked on this server.
     const response = await request.get(new URL(image!).pathname);
-    expect(response.status()).toBe(200);
-    expect(response.headers()['content-type']).toBe('image/png');
+    expect(response.status(), path).toBe(200);
+    expect(response.headers()['content-type'], path).toBe('image/png');
     // A PNG stores its width and height in bytes 16 to 23.
     const body = await response.body();
-    expect(body.readUInt32BE(16)).toBe(1200);
-    expect(body.readUInt32BE(20)).toBe(630);
-  });
-}
+    expect(body.readUInt32BE(16), path).toBe(1200);
+    expect(body.readUInt32BE(20), path).toBe(630);
+  }
+});
 
 test('the 404 page has no social card', async ({ page }) => {
   await page.goto('/nowhere/');

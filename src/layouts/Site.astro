@@ -6,6 +6,7 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import HeaderContent from '../components/HeaderContent.astro';
 import FooterContent from '../components/FooterContent.astro';
+import { cardMeta } from '../lib/og.ts';
 
 interface Props {
   title: string;
@@ -26,9 +27,6 @@ const { title, description, noindex = false, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // The home page's title already starts with the name.
 const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
-// src/pages/og/[...route].ts draws one card per page, named after its path.
-const cardKey = Astro.url.pathname.replace(/^\/|\/$/g, '') || 'index';
-const cardImage = new URL(`/og/${cardKey}.png`, Astro.site);
 ---
 
 <!doctype html>
@@ -61,11 +59,16 @@ const cardImage = new URL(`/og/${cardKey}.png`, Astro.site);
     <link rel="sitemap" href="/sitemap-index.xml" />
     {!noindex && (
       <>
+        <meta property="og:site_name" content="recdr" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={canonical} />
-        <meta property="og:image" content={cardImage} />
+        {cardMeta(Astro.url.pathname, Astro.site, pageTitle).map(
+          ([property, content]) => (
+            <meta property={property} content={content} />
+          ),
+        )}
         <meta name="twitter:card" content="summary_large_image" />
       </>
     )}
