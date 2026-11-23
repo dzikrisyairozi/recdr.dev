@@ -1,4 +1,5 @@
 ---
+import InstallCommand from '../components/InstallCommand.astro';
 import Site from '../layouts/Site.astro';
 ---
 
@@ -6,5 +7,45 @@ import Site from '../layouts/Site.astro';
   title="recdr: screen recordings your agent can read"
   description="recdr records a window, a screen region, a monitor or a Chrome tab, and leaves files an AI agent can read."
 >
-  <h1>recdr</h1>
+  <section class="placeholder">
+    <h1>Screen recordings your agent can read.</h1>
+    <p>
+      recdr records a window, a screen region, a monitor or a Chrome tab, and
+      leaves files an AI agent can read.
+    </p>
+    <div id="install">
+      <InstallCommand idPrefix="hero" />
+    </div>
+    <p>
+      <a href="https://github.com/dzikrisyairozi/recdr">
+        Source and documentation on GitHub
+      </a>
+    </p>
+  </section>
 </Site>
+
+<style>
+  .placeholder {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding: var(--space-24) var(--space-4);
+  }
+
+  h1 {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-hero);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 0 0 var(--space-8);
+    color: var(--text-muted);
+    font-size: var(--text-lg);
+  }
+
+  #install {
+    margin-bottom: var(--space-8);
+  }
+</style>
