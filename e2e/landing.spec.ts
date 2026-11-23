@@ -135,7 +135,7 @@ test('the chat in #agents shows every item once it is in view', async ({
 }) => {
   await page.goto('/');
   const items = page.locator('#agents [data-chat] > li');
-  await expect(items).toHaveCount(7);
+  await expect(items).toHaveCount(8);
   await page.locator('#agents [data-chat]').scrollIntoViewIfNeeded();
   // The items come in one at a time, 600 ms apart.
   for (const item of await items.all()) {
@@ -145,7 +145,7 @@ test('the chat in #agents shows every item once it is in view', async ({
     'claude mcp add recdr -- /path/to/recdr mcp',
   );
   await expect(items.last()).toContainText(
-    /appears at \d\.\ds and is gone by \d\.\ds\./,
+    /shows at \d+\.\ds and is gone by \d+\.\ds\./,
   );
 });
 

@@ -1,11 +1,24 @@
 ---
 import { Image } from 'astro:assets';
-import { contactSheet, frames } from '../lib/demo-assets.ts';
+import { contactSheet, frames, manifest } from '../lib/demo-assets.ts';
 
 const lastFrame = frames.at(-1)!;
+const seconds = Math.round(manifest.duration_ms / 1000);
+// The pinned scene sizes both figures from the window's height. It needs
+// the width-to-height ratio of the taller one.
+const ratio = Math.min(
+  manifest.width / manifest.height,
+  contactSheet.width / contactSheet.height,
+);
+const afterCaption = `The contact sheet of the same ${seconds} seconds. The Payment failed banner that showed and went is on it.`;
 ---
 
-<section id="why" class="section" data-scene="why">
+<section
+  id="why"
+  class="section"
+  data-scene="why"
+  style={`--ratio: ${ratio.toFixed(3)}`}
+>
   <div data-pin>
     <h2 class="section-title" data-reveal>
       One screenshot misses what happened
@@ -15,24 +28,21 @@ const lastFrame = frames.at(-1)!;
         <Image
           src={lastFrame.image}
           width={960}
-          alt="The checkout page after the payment. The button reads Paid and nothing else is on the page."
+          alt="The checkout page after the order went through. It reads Order confirmed and shows no error."
           loading="lazy"
         />
         <figcaption>
-          A screenshot taken after the click. The page looks finished.
+          A screenshot taken after the click. The order looks fine.
         </figcaption>
       </figure>
       <figure data-why-after>
         <Image
           src={contactSheet}
           width={1216}
-          alt="The contact sheet of the recording: a grid of the moments the page changed, with the toast Payment accepted in some of them."
+          alt="The contact sheet of the recording: a grid of the moments the page changed. One tile shows a red Payment failed banner."
           loading="lazy"
         />
-        <figcaption>
-          The contact sheet of the same six seconds. The toast that appeared and
-          went is on it.
-        </figcaption>
+        <figcaption>{afterCaption}</figcaption>
       </figure>
     </div>
   </div>
@@ -74,7 +84,7 @@ const lastFrame = frames.at(-1)!;
      viewport height, so the taller figure fits on one screen. */
   section[data-scene-active] .figures {
     grid-template-columns: 1fr;
-    width: min(100%, calc((100svh - 20rem) * 1.49));
+    width: min(100%, calc((100svh - 20rem) * var(--ratio)));
     /* a very short window would otherwise shrink the figures to nothing */
     min-width: min(100%, 20rem);
     margin-inline: auto;

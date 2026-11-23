@@ -98,7 +98,7 @@ const still = await getImage({
             src={gif.src}
             width={gif.width}
             height={gif.height}
-            alt="recording.gif: the Buy button is clicked, a bar fills and the toast Payment accepted comes and goes."
+            alt="recording.gif: Buy is clicked, a Payment failed banner shows and goes, and the page ends on Order confirmed."
             loading="lazy"
             decoding="async"
           />
@@ -112,7 +112,7 @@ const still = await getImage({
           poster={still.src}
           width={manifest.width}
           height={manifest.height}
-          aria-label="recording.mp4, the same six seconds as a video"
+          aria-label={`recording.mp4, the same ${Math.round(manifest.duration_ms / 1000)} seconds as a video`}
         ></video>
       </div>
     </article>

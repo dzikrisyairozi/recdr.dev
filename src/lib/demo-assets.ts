@@ -6,7 +6,9 @@ import manifest from '../assets/demo/manifest.json';
 import gif from '../assets/demo/recording.gif';
 import mp4Url from '../assets/demo/recording.mp4?url';
 import result from '../assets/demo/result.json';
+import story from '../../demo/story.json';
 import { buildFrames, clickPoint } from './frames.ts';
+import { session } from './story.ts';
 
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/demo/frames/*.png',
@@ -21,6 +23,8 @@ const frames = buildFrames(manifest, diff).map((frame) => {
 
 const keyframes = frames.filter((frame) => frame.keyframe).slice(0, 12);
 const click = clickPoint(manifest);
+// What an agent does to make this recording, and what it finds in it.
+const steps = session(manifest, story, result);
 
 export {
   click,
@@ -32,4 +36,5 @@ export {
   manifest,
   mp4Url,
   result,
+  steps,
 };
