@@ -1,0 +1,205 @@
+---
+import { Image } from 'astro:assets';
+import { contactSheet } from '../lib/demo-assets.ts';
+
+// Read off the labels on contact_sheet.png: the tile where the toast starts
+// to show, and the tile after it has left. Check both after recording again
+// (demo/RECORDING.md).
+const toastArrives = '2.3s';
+const toastGone = '4.3s';
+// One string: Astro drops the space between text and an expression that
+// starts a new line.
+const agentReply = `The toast "Payment accepted" appears at ${toastArrives} and is gone by ${toastGone}.`;
+---
+
+<section id="agents" class="section">
+  <h2 class="section-title" data-reveal>
+    Ask your agent to record
+  </h2>
+  <div class="layout">
+    <div>
+      <ol class="chat" data-chat>
+        <li class="message user">
+          <span class="who">You</span>
+          <p>
+            record the Chrome tab with the checkout page while you click Buy,
+            then show me the contact sheet
+          </p>
+        </li>
+        <li class="tool">
+          <span class="who">Tool call</span>
+          <code>list_tabs</code>
+        </li>
+        <li class="tool">
+          <span class="who">Tool call</span>
+          <code>start_recording</code>
+        </li>
+        <li class="aside">The agent clicks Buy.</li>
+        <li class="tool">
+          <span class="who">Tool call</span>
+          <code>stop_recording</code>
+        </li>
+        <li class="result">
+          <Image
+            src={contactSheet}
+            width={960}
+            alt="The contact sheet of the recording, as the tool returns it."
+            loading="lazy"
+          />
+          <p>
+            <code>stop_recording</code> returns the contact sheet as an image.
+          </p>
+        </li>
+        <li class="message agent">
+          <span class="who">Agent</span>
+          <p>{agentReply}</p>
+        </li>
+      </ol>
+      <p class="caption">
+        Illustration of an MCP session. The contact sheet is real recdr output.
+      </p>
+    </div>
+    <div class="setup">
+      <p>Works with Claude Code, and any MCP client or shell.</p>
+      <pre tabindex="0"><code>claude mcp add recdr -- /path/to/recdr mcp</code></pre>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initChatDemo } from '../scripts/chat-demo.ts';
+
+  initChatDemo();
+</script>
+
+<style>
+  .layout {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .layout > div {
+    min-width: 0;
+  }
+
+  .chat {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    list-style: none;
+  }
+
+  /* chat-demo.ts sets data-chat-ready, then data-shown on one item at a
+     time. A hidden item keeps its place, so nothing below it moves. */
+  .chat[data-chat-ready] > li {
+    transition:
+      opacity 400ms ease-out,
+      transform 400ms ease-out;
+  }
+
+  .chat[data-chat-ready] > li:not([data-shown]) {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  .who {
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .message {
+    max-width: 34rem;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+  }
+
+  .user {
+    justify-self: end;
+  }
+
+  .agent {
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .tool {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    border-left: 2px solid var(--rec);
+  }
+
+  .tool .who {
+    margin: 0;
+  }
+
+  .tool code,
+  .result code {
+    font-size: var(--text-sm);
+  }
+
+  .aside,
+  .result p,
+  .caption {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .aside {
+    padding-inline: var(--space-4);
+  }
+
+  .result {
+    max-width: 34rem;
+  }
+
+  .result :global(img) {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .caption {
+    margin-top: var(--space-3);
+  }
+
+  .setup p {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-lg);
+  }
+
+  pre {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+    }
+  }
+</style>

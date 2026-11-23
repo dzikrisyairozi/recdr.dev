@@ -1,0 +1,68 @@
+---
+import HeroDemo from './HeroDemo.astro';
+import InstallCommand from './InstallCommand.astro';
+---
+
+<section id="top" class="hero">
+  <div class="copy">
+    <h1>Screen recorder your agent can use.</h1>
+    <p class="lede">
+      recdr records a window, a screen region, a monitor or a Chrome tab. It
+      leaves a GIF or MP4 for you, and for your agent a contact sheet of the
+      moments the screen changed, a per-frame change log and the frames as PNG.
+    </p>
+    <InstallCommand idPrefix="hero" />
+    <p class="platforms">
+      Windows and macOS for windows, regions and monitors. Windows, macOS and
+      Linux for browser tabs.
+    </p>
+  </div>
+  <HeroDemo />
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-12);
+    max-width: var(--content-width);
+    margin-inline: auto;
+    padding: var(--space-12) var(--space-4) var(--space-16);
+  }
+
+  /* A grid item is at least as wide as its content by default, and the
+     install command is one long line. */
+  .copy {
+    min-width: 0;
+  }
+
+  h1 {
+    margin: 0 0 var(--space-6);
+    font-size: min(var(--text-hero), 5rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    max-width: 34rem;
+    margin: 0 0 var(--space-8);
+    color: var(--text-muted);
+    font-size: var(--text-lg);
+  }
+
+  .platforms {
+    margin: var(--space-4) 0 0;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: var(--space-16);
+      padding-block: var(--space-24);
+    }
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+import InstallCommand from './InstallCommand.astro';
+---
+
+<section id="install" class="section">
+  <h2 class="section-title" data-reveal>
+    Install recdr
+  </h2>
+  <div class="command">
+    <InstallCommand idPrefix="install" />
+  </div>
+  <p>
+    <a href="https://github.com/dzikrisyairozi/recdr">Source on GitHub</a>
+    <span aria-hidden="true">·</span>
+    <span>MIT license</span>
+  </p>
+</section>
+
+<style>
+  section {
+    text-align: center;
+  }
+
+  .command {
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+
+  p {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-6) 0 0;
+    color: var(--text-muted);
+  }
+</style>

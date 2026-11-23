@@ -1,0 +1,249 @@
+---
+import { Image } from 'astro:assets';
+import { click, frames, keyframes } from '../lib/demo-assets.ts';
+
+const command = 'recdr record --cdp 9222 --tab checkout --duration 6s';
+const firstFrame = frames[0]!;
+---
+
+<div
+  class="demo"
+  data-hero-demo
+  role="img"
+  aria-label="Animation: a terminal runs recdr record, a checkout page is recorded, and its frames fill a grid."
+>
+  <div class="terminal">
+    <div class="line">
+      <span class="prompt">$</span>
+      <span class="typed" style={`--chars: ${command.length}`}>
+        {command}
+      </span>
+    </div>
+    <div class="clock" data-demo-clock>
+      <span class="dot"></span>
+      <span>REC</span>
+      <span data-demo-timecode>00:00.0</span>
+    </div>
+  </div>
+  <div class="page">
+    <Image
+      src={firstFrame.image}
+      width={480}
+      widths={[480, 960]}
+      sizes="(min-width: 64rem) 32rem, 100vw"
+      alt=""
+      loading="eager"
+    />
+    {click && (
+      <span class="ring" style={`left: ${click.x}%; top: ${click.y}%`} />
+    )}
+  </div>
+  <div class="tiles">
+    {keyframes.map((frame, i) => (
+      <div class="tile" style={`--i: ${i}`}>
+        <Image src={frame.image} width={240} alt="" loading="eager" />
+        <span>{frame.timecode}</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  import { initHeroDemo } from '../scripts/hero-demo.ts';
+
+  initHeroDemo();
+</script>
+
+<style>
+  /*
+    One 8 s loop. Every animation has the same duration, so they stay in step:
+      0 to 1.5 s    the command is typed          (0% to 18.75%)
+      1.5 to 6.5 s  the REC line shows            (18.75% to 81.25%)
+      3.0 to 3.4 s  the click ring                (37.5% to 42.5%)
+      6.5 to 7.5 s  the keyframe tiles come in    (from 81.25%)
+    Without an animation each element is in the state the loop ends in.
+  */
+  .demo {
+    display: grid;
+    gap: var(--space-3);
+    /* minmax(0, ...) lets the one-line command shrink with the card */
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + var(--space-3));
+    background: var(--surface);
+  }
+
+  .demo :global(*) {
+    animation-duration: 8s;
+    animation-iteration-count: infinite;
+  }
+
+  .demo[data-paused] :global(*) {
+    animation-play-state: paused;
+  }
+
+  .demo :global(img) {
+    display: block;
+    width: 100%;
+  }
+
+  .terminal {
+    padding: var(--space-3);
+    border-radius: var(--radius);
+    background: var(--bg);
+    font-family: var(--font-mono);
+    /* the prompt and the 52 characters of the command share one line on a phone */
+    font-size: clamp(0.5rem, 2.3vw, 0.8125rem);
+    line-height: 1.9;
+  }
+
+  .line {
+    display: flex;
+    gap: 1ch;
+  }
+
+  .prompt {
+    color: var(--text-muted);
+  }
+
+  .typed {
+    overflow: hidden;
+    width: calc(var(--chars) * 1ch);
+    white-space: nowrap;
+    animation-name: type;
+  }
+
+  .clock {
+    display: flex;
+    align-items: center;
+    gap: 1ch;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    animation-name: clock;
+  }
+
+  .dot {
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: var(--rec);
+  }
+
+  .page {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+  }
+
+  .ring {
+    position: absolute;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: -1.25rem 0 0 -1.25rem;
+    border: 2px solid var(--rec);
+    border-radius: 50%;
+    opacity: 0;
+    animation-name: ring;
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+  }
+
+  .tile {
+    animation-name: tile;
+    animation-delay: calc(var(--i) * 80ms);
+    /* keeps the tile hidden while its delay runs on the first loop */
+    animation-fill-mode: backwards;
+  }
+
+  .tile :global(img) {
+    border-radius: 6px;
+  }
+
+  .tile span {
+    display: block;
+    margin-top: var(--space-1);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @keyframes type {
+    0% {
+      width: 0;
+      animation-timing-function: steps(52, end);
+    }
+
+    18.75%,
+    100% {
+      width: calc(var(--chars) * 1ch);
+    }
+  }
+
+  @keyframes clock {
+    0%,
+    18.74% {
+      opacity: 0;
+    }
+
+    18.75%,
+    81.25% {
+      opacity: 1;
+    }
+
+    83%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes ring {
+    0%,
+    37.49% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+
+    37.5% {
+      opacity: 1;
+      transform: scale(0.3);
+    }
+
+    42.5%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes tile {
+    0%,
+    81.25% {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+
+    84%,
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .demo :global(*) {
+      animation: none;
+    }
+
+    .clock {
+      display: none;
+    }
+  }
+</style>

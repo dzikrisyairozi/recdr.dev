@@ -1,0 +1,101 @@
+---
+// From the recdr README: Build, Commands and Limits.
+const desktop = [
+  'Yes, on Windows 10 1903 or later',
+  'Yes, on macOS 14 or later',
+  'No',
+];
+const rows: { name: string; cells: string[] }[] = [
+  { name: 'Window', cells: desktop },
+  { name: 'Screen region', cells: desktop },
+  { name: 'Monitor', cells: desktop },
+  { name: 'Browser tab', cells: ['Yes', 'Yes', 'Yes'] },
+  { name: 'The app (<code>recdr gui</code>)', cells: ['Yes', 'Yes', 'No'] },
+  {
+    name: 'MP4 encoder',
+    cells: [
+      'Media Foundation',
+      'AVFoundation',
+      '<code>ffmpeg</code> on <code>PATH</code>',
+    ],
+  },
+];
+---
+
+<section id="platforms" class="section">
+  <h2 class="section-title" data-reveal>
+    Where it runs
+  </h2>
+  <!-- A wide table scrolls inside this box, so it needs to take focus. -->
+  <div class="scroll" role="region" aria-label="Platform table" tabindex="0">
+    <table>
+      <caption>What recdr records on each system</caption>
+      <thead>
+        <tr>
+          <td></td>
+          <th scope="col">Windows</th>
+          <th scope="col">macOS</th>
+          <th scope="col">Linux</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <th scope="row" set:html={row.name} />
+            {row.cells.map((cell) => (
+              <td class:list={{ no: cell === 'No' }} set:html={cell} />
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  caption {
+    padding: var(--space-4) var(--space-6);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border);
+    font-weight: 400;
+    vertical-align: top;
+  }
+
+  thead th {
+    font-weight: 600;
+  }
+
+  tbody th {
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .no {
+    color: var(--text-muted);
+  }
+
+  code {
+    font-size: 0.9em;
+  }
+</style>

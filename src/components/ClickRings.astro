@@ -1,0 +1,45 @@
+---
+// recdr draws a ring for 400 ms after each click in its GIF and MP4.
+// The landing page does the same for the visitor's own clicks.
+---
+
+<div data-click-rings aria-hidden="true"></div>
+
+<script>
+  import { initClickRings } from '../scripts/click-rings.ts';
+
+  initClickRings();
+</script>
+
+<style>
+  [data-click-rings] {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* click-rings.ts adds the rings, so they carry no scope attribute. */
+  [data-click-rings] :global(.ring) {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid var(--rec);
+    border-radius: 50%;
+    animation: click-ring 400ms ease-out forwards;
+  }
+
+  @keyframes click-ring {
+    from {
+      opacity: 1;
+      transform: scale(0.5);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(2);
+    }
+  }
+</style>

@@ -1,0 +1,46 @@
+{
+  "id": "20261123-124910-9341",
+  "dir": "D:\\recdr.dev\\.recdr\\20261123-124910-9341",
+  "stop_reason": "duration_reached",
+  "duration_ms": 6008,
+  "width": 960,
+  "height": 600,
+  "frames_stored": 19,
+  "dropped_frames": 0,
+  "keyframes": [
+    {
+      "t_ms": 0,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000001.png"
+    },
+    {
+      "t_ms": 1583,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000002.png"
+    },
+    {
+      "t_ms": 2296,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000012.png"
+    },
+    {
+      "t_ms": 2297,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000013.png"
+    },
+    {
+      "t_ms": 2505,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000014.png"
+    },
+    {
+      "t_ms": 4080,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000018.png"
+    },
+    {
+      "t_ms": 4325,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000019.png"
+    }
+  ],
+  "marks": [],
+  "gif": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\recording.gif",
+  "mp4": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\recording.mp4",
+  "contact_sheet": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\contact_sheet.png",
+  "diff": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\diff.json",
+  "manifest": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\manifest.json"
+}

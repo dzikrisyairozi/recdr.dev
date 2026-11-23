@@ -34,12 +34,11 @@ const { idPrefix } = Astro.props;
     <div class="panels">
       {installCommands.map((command, i) => (
         <div
-          class="panel"
+          class:list={['panel', { shown: i === 0 }]}
           role="tabpanel"
           data-panel={command.id}
           id={`${idPrefix}-panel-${command.id}`}
           aria-labelledby={`${idPrefix}-tab-${command.id}`}
-          hidden={i !== 0}
         >
           <span class="panel-label">{command.label}</span>
           <pre tabindex="0"><code>{command.text}</code></pre>
@@ -58,7 +57,7 @@ const { idPrefix } = Astro.props;
         display: none;
       }
 
-      [data-install] .panels [role='tabpanel'][hidden],
+      [data-install] .panels .panel[role='tabpanel'],
       [data-install] .panels .panel-label {
         display: block;
       }
@@ -116,8 +115,15 @@ const { idPrefix } = Astro.props;
     min-width: 0;
   }
 
+  /* A class hides the other panels, not the hidden attribute: a reader that
+     ignores CSS still gets all four commands. */
   .panel {
+    display: none;
     padding: var(--space-3) var(--space-4);
+  }
+
+  .panel.shown {
+    display: block;
   }
 
   /* Only the <noscript> styles show the label. */

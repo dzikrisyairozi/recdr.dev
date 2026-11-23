@@ -1,0 +1,116 @@
+{
+  "id": "20261123-124910-9341",
+  "width": 960,
+  "height": 600,
+  "fps": 15,
+  "started_at_unix_ms": 1795438150872,
+  "duration_ms": 6008,
+  "frames": [
+    {
+      "index": 1,
+      "t_ms": 0,
+      "file": "frames/000001.png"
+    },
+    {
+      "index": 2,
+      "t_ms": 1583,
+      "file": "frames/000002.png"
+    },
+    {
+      "index": 3,
+      "t_ms": 1585,
+      "file": "frames/000003.png"
+    },
+    {
+      "index": 4,
+      "t_ms": 1595,
+      "file": "frames/000004.png"
+    },
+    {
+      "index": 5,
+      "t_ms": 1773,
+      "file": "frames/000005.png"
+    },
+    {
+      "index": 6,
+      "t_ms": 1805,
+      "file": "frames/000006.png"
+    },
+    {
+      "index": 7,
+      "t_ms": 1827,
+      "file": "frames/000007.png"
+    },
+    {
+      "index": 8,
+      "t_ms": 2010,
+      "file": "frames/000008.png"
+    },
+    {
+      "index": 9,
+      "t_ms": 2037,
+      "file": "frames/000009.png"
+    },
+    {
+      "index": 10,
+      "t_ms": 2036,
+      "file": "frames/000010.png"
+    },
+    {
+      "index": 11,
+      "t_ms": 2296,
+      "file": "frames/000011.png"
+    },
+    {
+      "index": 12,
+      "t_ms": 2296,
+      "file": "frames/000012.png"
+    },
+    {
+      "index": 13,
+      "t_ms": 2297,
+      "file": "frames/000013.png"
+    },
+    {
+      "index": 14,
+      "t_ms": 2505,
+      "file": "frames/000014.png"
+    },
+    {
+      "index": 15,
+      "t_ms": 2537,
+      "file": "frames/000015.png"
+    },
+    {
+      "index": 16,
+      "t_ms": 4079,
+      "file": "frames/000016.png"
+    },
+    {
+      "index": 17,
+      "t_ms": 4079,
+      "file": "frames/000017.png"
+    },
+    {
+      "index": 18,
+      "t_ms": 4080,
+      "file": "frames/000018.png"
+    },
+    {
+      "index": 19,
+      "t_ms": 4325,
+      "file": "frames/000019.png"
+    }
+  ],
+  "marks": [],
+  "clicks": [
+    {
+      "t_ms": 1551,
+      "x": 480,
+      "y": 282,
+      "button": "left"
+    }
+  ],
+  "stop_reason": "duration_reached",
+  "dropped_frames": 0
+}
