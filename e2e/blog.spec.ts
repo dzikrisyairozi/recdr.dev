@@ -51,3 +51,20 @@ test('code in a post is light text on the dark page', async ({ browser }) => {
   expect(red! + green! + blue!).toBeGreaterThan(450);
   await context.close();
 });
+
+for (const path of ['/', '/blog/', '/changelog/']) {
+  test(`${path} announces the feed to feed readers`, async ({ page }) => {
+    await page.goto(path);
+    const feed = page.locator('link[rel="alternate"]');
+    await expect(feed).toHaveAttribute('type', 'application/rss+xml');
+    await expect(feed).toHaveAttribute('title', 'recdr blog');
+    await expect(feed).toHaveAttribute('href', '/blog/rss.xml');
+  });
+}
+
+test('/blog/ has a visible link to the feed', async ({ page }) => {
+  await page.goto('/blog/');
+  await expect(
+    page.getByRole('main').getByRole('link', { name: 'RSS feed' }),
+  ).toHaveAttribute('href', '/blog/rss.xml');
+});

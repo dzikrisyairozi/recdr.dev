@@ -26,6 +26,9 @@ const posts = publishedPosts(await getCollection('blog'));
         ))}
       </ul>
     )}
+    <p class="feed">
+      <a href="/blog/rss.xml">RSS feed</a>
+    </p>
   </section>
 </Site>
 
@@ -59,5 +62,9 @@ const posts = publishedPosts(await getCollection('blog'));
   p {
     margin: 0;
     color: var(--text-muted);
+  }
+
+  .feed {
+    margin-top: var(--space-8);
   }
 </style>
