@@ -163,7 +163,12 @@ test('the header Install link leads to the install section', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(page.locator('#install [data-install]')).toBeVisible();
+  await page
+    .getByRole('banner')
+    .getByRole('link', { name: 'Install', exact: true })
+    .click();
+  await expect(page).toHaveURL(/#install$/);
+  await expect(page.locator('#install [data-install]')).toBeInViewport();
   await expect(page.locator('#install')).toContainText('MIT license');
 });
 
@@ -176,4 +181,23 @@ test('a click draws a ring that is gone again after 600 ms', async ({
   await expect(rings).toHaveCount(1);
   await page.waitForTimeout(600);
   await expect(rings).toHaveCount(0);
+});
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('no section makes the page scroll sideways', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#how .pin-spacer')).toBeAttached();
+    const ids = await page
+      .locator('main > section')
+      .evaluateAll((sections) => sections.map((section) => section.id));
+    for (const id of ids) {
+      await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(overflow, `#${id}`).toBeLessThanOrEqual(0);
+    }
+  });
 });
