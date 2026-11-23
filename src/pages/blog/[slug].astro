@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { getCollection, render } from 'astro:content';
 import Site from '../../layouts/Site.astro';
 import { publishedPosts } from '../../lib/blog.ts';
+import { cardUrl } from '../../lib/og.ts';
 
 export const getStaticPaths = (async () => {
   const posts = publishedPosts(await getCollection('blog'));
@@ -12,6 +13,7 @@ export const getStaticPaths = (async () => {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
+const published = post.data.date.toISOString().slice(0, 10);
 // The site has no bylines, so the project is the author.
 const recdr = { '@type': 'Organization', name: 'recdr', url: Astro.site };
 const jsonLd = {
@@ -19,7 +21,8 @@ const jsonLd = {
   '@type': 'BlogPosting',
   headline: post.data.title,
   description: post.data.description,
-  datePublished: post.data.date.toISOString().slice(0, 10),
+  datePublished: published,
+  image: cardUrl(Astro.url.pathname, Astro.site),
   url: new URL(Astro.url.pathname, Astro.site),
   author: recdr,
   publisher: recdr,
@@ -30,11 +33,10 @@ const jsonLd = {
   title={post.data.title}
   description={post.data.description}
   jsonLd={jsonLd}
+  published={published}
 >
   <article class="page">
-    <time datetime={post.data.date.toISOString().slice(0, 10)}>
-      {post.data.date.toISOString().slice(0, 10)}
-    </time>
+    <time datetime={published}>{published}</time>
     <h1 class="page-title">{post.data.title}</h1>
     <div class="prose">
       <Content />

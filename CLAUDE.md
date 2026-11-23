@@ -335,9 +335,11 @@ no server, no database and no workspace package. The spec,
 
 ### Environment Variables
 
-None is required. `GITHUB_TOKEN`, when set at build time, raises the GitHub
-API limit for the changelog and the star count. A build without network access
-still passes.
+None is required locally. `GITHUB_TOKEN`, when set at build time, raises the
+GitHub API limit for the changelog and the star count. A local or preview build
+without network access still passes. A production build (Cloudflare Pages sets
+`CF_PAGES_BRANCH=main`) fails when the releases cannot be read, so the Pages
+project should have `GITHUB_TOKEN` set.
 
 ### Deployment
 

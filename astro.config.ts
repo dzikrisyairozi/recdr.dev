@@ -13,6 +13,7 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/dzikrisyairozi/recdr.dev/edit/main/',
       },
+      routeMiddleware: './src/route-data.ts',
       customCss: [
         '@fontsource-variable/geist',
         '@fontsource-variable/geist-mono',

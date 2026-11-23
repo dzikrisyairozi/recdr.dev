@@ -7,7 +7,8 @@ export const GET: APIRoute = async (context) => {
   const posts = publishedPosts(await getCollection('blog'));
   return rss({
     title: 'recdr blog',
-    description: 'News about recdr.',
+    description:
+      'News about recdr, the screen recorder AI agents drive through a CLI or an MCP server.',
     // astro.config.ts sets `site`, so it is never undefined here.
     site: context.site!,
     // A feed that names its own address and language passes the W3C validator.

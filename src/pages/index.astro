@@ -10,11 +10,45 @@ import InstallSection from '../components/InstallSection.astro';
 import PlatformMatrix from '../components/PlatformMatrix.astro';
 import WhySection from '../components/WhySection.astro';
 import Site from '../layouts/Site.astro';
+import { REPO } from '../lib/github.ts';
+import { plainText, questions } from '../lib/landing.ts';
+
+const description =
+  'recdr records a window, a screen region, a monitor or a Chrome tab and leaves files an AI agent can read. Agents drive it through a JSON CLI or an MCP server.';
+
+// What a search engine or an answer engine reads about recdr and the FAQ.
+// The values are the README's: the systems it runs on, the MIT license, no price.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'recdr',
+      description,
+      url: Astro.site,
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Windows, macOS, Linux',
+      license: 'https://opensource.org/license/mit',
+      downloadUrl: `https://github.com/${REPO}/releases`,
+      sameAs: `https://github.com/${REPO}`,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: questions.map(({ question, answer }) => ({
+        '@type': 'Question',
+        name: question,
+        acceptedAnswer: { '@type': 'Answer', text: plainText(answer) },
+      })),
+    },
+  ],
+};
 ---
 
 <Site
   title="recdr: screen recorder your agent can use"
-  description="recdr records a window, a screen region, a monitor or a Chrome tab, and leaves files an AI agent can read."
+  description={description}
+  jsonLd={jsonLd}
 >
   <Hero />
   <WhySection />

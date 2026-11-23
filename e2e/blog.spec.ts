@@ -113,3 +113,30 @@ test('the feed names its own address and its language', async ({ request }) => {
   );
   expect(xml).toContain('<language>en</language>');
 });
+
+test('a post is an article with a publication date and a picture', async ({
+  page,
+}) => {
+  await page.goto('/blog/introducing-recdr/');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+    'content',
+    'article',
+  );
+  await expect(
+    page.locator('meta[property="article:published_time"]'),
+  ).toHaveAttribute('content', '2026-11-23');
+  const data = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ??
+      '',
+  ) as { image?: string };
+  expect(data.image).toBe('https://recdr.dev/og/blog/introducing-recdr.png');
+
+  await page.goto('/blog/');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+    'content',
+    'website',
+  );
+  await expect(
+    page.locator('meta[property="article:published_time"]'),
+  ).toHaveCount(0);
+});
