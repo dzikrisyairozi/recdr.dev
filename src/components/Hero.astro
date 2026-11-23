@@ -1,11 +1,12 @@
 ---
 import HeroDemo from './HeroDemo.astro';
 import InstallCommand from './InstallCommand.astro';
+import { headline } from '../lib/landing.ts';
 ---
 
 <section id="top" class="hero">
   <div class="copy">
-    <h1>Screen recorder your agent can use.</h1>
+    <h1>{headline}</h1>
     <p class="lede">
       recdr records a window, a screen region, a monitor or a Chrome tab. It
       leaves a GIF or MP4 for you, and for your agent a contact sheet of the

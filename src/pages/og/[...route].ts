@@ -1,13 +1,14 @@
 import { getCollection } from 'astro:content';
 import { OGImageRoute } from 'astro-og-canvas';
 import { publishedPosts } from '../../lib/blog.ts';
+import { headline } from '../../lib/landing.ts';
 import { checkCard, type Card } from '../../lib/og.ts';
 
 // The key is the page's path without its outer slashes, so /docs/install/
 // has its card at /og/docs/install.png. cardKey in src/lib/og.ts works the
 // same key out from a page's URL.
 const pages: Record<string, Card> = {
-  index: { title: 'Screen recorder your agent can use.' },
+  index: { title: headline },
   changelog: { title: 'recdr changelog' },
   blog: { title: 'recdr blog' },
 };
