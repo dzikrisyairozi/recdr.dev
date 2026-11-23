@@ -1,4 +1,5 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
+import { installCommands } from '../src/lib/install.ts';
 
 /** The path of every page the sitemap lists. */
 async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
@@ -103,4 +104,23 @@ test('the landing page describes recdr and its FAQ as structured data', async ({
   expect(entries[0]?.acceptedAnswer.text).toContain(
     'which is ./.recdr unless you pass --out.',
   );
+});
+
+test('/llms.txt lists the install commands and every docs page', async ({
+  request,
+}) => {
+  const response = await request.get('/llms.txt');
+  expect(response.status()).toBe(200);
+  const text = await response.text();
+  expect(text.startsWith('# recdr\n\n> recdr records a window')).toBe(true);
+  for (const command of installCommands) {
+    expect(text).toContain(command.text);
+  }
+  const docs = (await sitemapPaths(request)).filter((path) =>
+    path.startsWith('/docs/'),
+  );
+  expect(docs.length).toBe(14);
+  for (const path of docs) {
+    expect(text).toContain(`](https://recdr.dev${path}): `);
+  }
 });
