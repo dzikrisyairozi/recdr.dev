@@ -62,6 +62,10 @@ const pages: [string, string][] = [
   ['/docs/guides/browser-tabs/', 'Record a browser tab'],
   ['/docs/guides/export/', 'Export part of a recording'],
   ['/docs/guides/app/', 'The app'],
+  ['/docs/guides/mcp/', 'MCP'],
+  ['/docs/guides/macos-permissions/', 'macOS permissions'],
+  ['/docs/reference/commands/', 'Commands'],
+  ['/docs/reference/output-files/', 'What a recording leaves'],
 ];
 
 test('every docs page answers and has its title', async ({ page }) => {
