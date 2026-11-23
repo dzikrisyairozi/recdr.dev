@@ -8,6 +8,11 @@ export function cardKey(pathname: string): string {
   return pathname.replace(/^\/|\/$/g, '') || 'index';
 }
 
+/** The address of a page's card. */
+export function cardUrl(pathname: string, site: URL | undefined): string {
+  return new URL(`/og/${cardKey(pathname)}.png`, site).href;
+}
+
 /** The Open Graph tags for a page's card, as [property, content] pairs. */
 export function cardMeta(
   pathname: string,
@@ -15,7 +20,7 @@ export function cardMeta(
   alt: string,
 ): [property: string, content: string][] {
   return [
-    ['og:image', new URL(`/og/${cardKey(pathname)}.png`, site).href],
+    ['og:image', cardUrl(pathname, site)],
     ['og:image:type', 'image/png'],
     ['og:image:width', '1200'],
     ['og:image:height', '630'],

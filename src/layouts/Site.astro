@@ -21,9 +21,11 @@ interface Props {
    * is written as its JSON escape, so no text in it can close the script tag.
    */
   jsonLd?: Record<string, unknown>;
+  /** The day a blog post came out, as 2026-11-23. Makes the page an article. */
+  published?: string;
 }
 
-const { title, description, noindex = false, jsonLd } = Astro.props;
+const { title, description, noindex = false, jsonLd, published } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // The home page's title already starts with the name.
 const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
@@ -62,7 +64,10 @@ const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
         <meta property="og:site_name" content="recdr" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content={published ? 'article' : 'website'} />
+        {published && (
+          <meta property="article:published_time" content={published} />
+        )}
         <meta property="og:url" content={canonical} />
         {cardMeta(Astro.url.pathname, Astro.site, pageTitle).map(
           ([property, content]) => (
