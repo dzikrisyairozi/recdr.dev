@@ -124,3 +124,63 @@ test('/llms.txt lists the install commands and every docs page', async ({
     expect(text).toContain(`](https://recdr.dev${path}): `);
   }
 });
+
+// One page of each kind: the landing page, a docs page, the changelog, the
+// blog and a post.
+for (const [path, title] of [
+  ['/', 'recdr: screen recorder your agent can use'],
+  ['/docs/install/', 'Install | recdr'],
+  ['/changelog/', 'Changelog | recdr'],
+  ['/blog/', 'Blog | recdr'],
+  ['/blog/introducing-recdr/', 'Introducing recdr | recdr'],
+] as const) {
+  test(`${path} has its title, description and canonical address`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+
+    const description = await page
+      .locator('meta[name="description"]')
+      .getAttribute('content');
+    expect(description?.length).toBeGreaterThan(50);
+    expect(description?.length).toBeLessThanOrEqual(160);
+
+    const address = `https://recdr.dev${path}`;
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      address,
+    );
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      'content',
+      address,
+    );
+  });
+}
+
+test('the sitemap lists every page and nothing else', async ({ request }) => {
+  const paths = await sitemapPaths(request);
+  expect(paths).toEqual(
+    expect.arrayContaining([
+      '/',
+      '/changelog/',
+      '/blog/',
+      '/blog/introducing-recdr/',
+      '/docs/',
+      '/docs/install/',
+      '/docs/quick-start/',
+      '/docs/build-from-source/',
+      '/docs/guides/app/',
+      '/docs/guides/browser-tabs/',
+      '/docs/guides/export/',
+      '/docs/guides/macos-permissions/',
+      '/docs/guides/mcp/',
+      '/docs/reference/commands/',
+      '/docs/reference/error-codes/',
+      '/docs/reference/limits/',
+      '/docs/reference/output-files/',
+      '/docs/reference/stop-reasons/',
+    ]),
+  );
+  expect(paths).toHaveLength(18);
+});
