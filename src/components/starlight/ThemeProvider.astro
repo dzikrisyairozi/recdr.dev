@@ -1,0 +1,8 @@
+---
+// The site has one theme. Starlight's own provider picks light or dark from
+// the system setting; this one always sets dark, before the page paints.
+---
+
+<script is:inline>
+  document.documentElement.dataset.theme = 'dark';
+</script>

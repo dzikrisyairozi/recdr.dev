@@ -1,0 +1,21 @@
+---
+// Starlight's footer holds the previous and next page links, so it stays,
+// with the site's footer under it.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import FooterContent from '../FooterContent.astro';
+---
+
+<Default>
+  <slot />
+</Default>
+<div class="site-footer">
+  <FooterContent />
+</div>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border);
+  }
+</style>
