@@ -1,8 +1,5 @@
 ---
-// The site has one theme. Starlight's own provider picks light or dark from
-// the system setting; this one always sets dark, before the page paints.
+// Empty on purpose. Starlight's provider picks light or dark from the system
+// setting; without it the page keeps the data-theme="dark" that Starlight
+// writes on <html>.
 ---
-
-<script is:inline>
-  document.documentElement.dataset.theme = 'dark';
-</script>
