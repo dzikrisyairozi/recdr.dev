@@ -1,5 +1,6 @@
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
+import starlightLinksValidator from 'starlight-links-validator';
 
 export default defineConfig({
   site: 'https://recdr.dev',
@@ -21,6 +22,13 @@ export default defineConfig({
         ThemeProvider: './src/components/starlight/ThemeProvider.astro',
         ThemeSelect: './src/components/starlight/ThemeSelect.astro',
       },
+      // Fails the build on a docs link that leads nowhere. Only the docs are
+      // Starlight pages, so links out of them are not checked.
+      plugins: [
+        starlightLinksValidator({
+          exclude: ['/', '/changelog{,/**/*}', '/blog{,/**/*}'],
+        }),
+      ],
       sidebar: [
         {
           label: 'Start here',
