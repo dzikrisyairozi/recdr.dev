@@ -66,6 +66,10 @@ const pages: [string, string][] = [
   ['/docs/guides/macos-permissions/', 'macOS permissions'],
   ['/docs/reference/commands/', 'Commands'],
   ['/docs/reference/output-files/', 'What a recording leaves'],
+  ['/docs/reference/stop-reasons/', 'Stop reasons'],
+  ['/docs/reference/error-codes/', 'Error codes'],
+  ['/docs/reference/limits/', 'Limits'],
+  ['/docs/build-from-source/', 'Build from source'],
 ];
 
 test('every docs page answers and has its title', async ({ page }) => {

@@ -24,7 +24,12 @@ export default defineConfig({
       sidebar: [
         {
           label: 'Start here',
-          items: ['docs', 'docs/install', 'docs/quick-start'],
+          items: [
+            'docs',
+            'docs/install',
+            'docs/quick-start',
+            'docs/build-from-source',
+          ],
         },
         {
           label: 'Guides',
