@@ -31,7 +31,7 @@ pnpm dev
 4. Commit with a [Conventional Commits](https://www.conventionalcommits.org/)
    message, for example `fix(landing): keep the scrubber strip inside the viewport`.
    Husky runs Prettier on staged files and commitlint on the message.
-5. Open a pull request to `main`. CI runs the same checks plus Lighthouse, and
+5. Open a pull request. CI runs the same checks plus Lighthouse, and
    Cloudflare Pages adds a preview URL.
 
 ## Rules for content

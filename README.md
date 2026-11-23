@@ -67,11 +67,14 @@ this repository a preview URL.
 | Build command    | `pnpm build`                                       |
 | Output directory | `dist`                                             |
 | `PNPM_VERSION`   | `9.6.0` (the build image's own pnpm is version 10) |
-| `GITHUB_TOKEN`   | optional; raises the GitHub API limit at build     |
+| `GITHUB_TOKEN`   | raises the GitHub API limit at build; set it       |
 
 Node comes from `.node-version`. The redirect rules are in `public/_redirects`.
-A build without network access still passes: the changelog then links to the
-releases on GitHub.
+A local or preview build without network access still passes: the changelog
+then links to the releases on GitHub. A production build (`CF_PAGES_BRANCH` is
+`main`) fails when it cannot read the releases, and Cloudflare Pages keeps the
+deployment before it. Without `GITHUB_TOKEN` the limit is 60 requests an hour
+for each build machine's address.
 
 ## Contributing
 
