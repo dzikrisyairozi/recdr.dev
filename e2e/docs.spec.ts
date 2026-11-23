@@ -1,11 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-test('/docs/ is the start page of the docs', async ({ page }) => {
-  const response = await page.goto('/docs/');
-  expect(response?.status()).toBe(200);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('recdr');
-});
-
 test('the docs are dark only', async ({ browser }) => {
   const context = await browser.newContext({ colorScheme: 'light' });
   const page = await context.newPage();
@@ -80,4 +74,32 @@ test('every docs page answers and has its title', async ({ page }) => {
       title,
     );
   }
+});
+
+test('search finds the commands page', async ({ page }) => {
+  await page.goto('/docs/');
+  await page.getByRole('button', { name: 'Search' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('textbox').fill('record');
+  await expect(
+    dialog.locator('a[href="/docs/reference/commands/"]').first(),
+  ).toBeVisible();
+});
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('a docs page fits the screen and its menu opens', async ({ page }) => {
+    // The commands page has the widest code blocks of the docs.
+    await page.goto('/docs/reference/commands/');
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+
+    const link = page.getByRole('link', { name: 'Error codes' });
+    await expect(link).toBeHidden();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(link).toBeVisible();
+  });
 });
