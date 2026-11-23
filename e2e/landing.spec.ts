@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+declare global {
+  interface Window {
+    ringsSeen?: number;
+  }
+}
+
 test('the hero has the headline, the install block and the demo', async ({
   page,
 }) => {
@@ -172,15 +178,25 @@ test('the header Install link leads to the install section', async ({
   await expect(page.locator('#install')).toContainText('MIT license');
 });
 
-test('a click draws a ring that is gone again after 600 ms', async ({
+test('a click draws one ring, which is removed when it has faded', async ({
   page,
 }) => {
   await page.goto('/');
-  const rings = page.locator('[data-click-rings] .ring');
+  // A ring lives for 400 ms, so the page counts the rings itself; polling
+  // for the element from here can miss it.
+  await page.evaluate(() => {
+    window.ringsSeen = 0;
+    new MutationObserver((records) => {
+      for (const record of records) {
+        window.ringsSeen! += record.addedNodes.length;
+      }
+    }).observe(document.querySelector('[data-click-rings]')!, {
+      childList: true,
+    });
+  });
   await page.mouse.click(200, 300);
-  await expect(rings).toHaveCount(1);
-  await page.waitForTimeout(600);
-  await expect(rings).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.ringsSeen)).toBe(1);
+  await expect(page.locator('[data-click-rings] .ring')).toHaveCount(0);
 });
 
 test.describe('on a phone', () => {
