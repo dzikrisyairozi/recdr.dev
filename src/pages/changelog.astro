@@ -3,6 +3,14 @@ import Site from '../layouts/Site.astro';
 import { fetchReleases, REPO } from '../lib/github.ts';
 
 const releases = await fetchReleases(fetch, process.env.GITHUB_TOKEN);
+// Cloudflare Pages sets CF_PAGES_BRANCH. On the production branch a build
+// that could not read the releases fails, and Pages keeps the deployment
+// before it online. A preview or local build shows a link to GitHub instead.
+if (releases === null && process.env.CF_PAGES_BRANCH === 'main') {
+  throw new Error(
+    'The releases could not be read from GitHub (see the [github] warning above). If the API limit was hit, set GITHUB_TOKEN in the Pages project.',
+  );
+}
 const releasesUrl = `https://github.com/${REPO}/releases`;
 ---
 
