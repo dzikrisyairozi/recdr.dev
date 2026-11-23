@@ -6,7 +6,10 @@ import { publishedPosts } from '../../lib/blog.ts';
 const posts = publishedPosts(await getCollection('blog'));
 ---
 
-<Site title="Blog" description="News about recdr.">
+<Site
+  title="Blog"
+  description="News about recdr, the screen recorder AI agents drive through a CLI or an MCP server."
+>
   <section class="page">
     <h1 class="page-title">Blog</h1>
     <ul>

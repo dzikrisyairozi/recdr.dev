@@ -8,8 +8,8 @@ import { checkCard, type Card } from '../../lib/og.ts';
 // same key out from a page's URL.
 const pages: Record<string, Card> = {
   index: { title: 'Screen recorder your agent can use.' },
-  changelog: { title: 'Changelog' },
-  blog: { title: 'Blog' },
+  changelog: { title: 'recdr changelog' },
+  blog: { title: 'recdr blog' },
 };
 for (const entry of await getCollection('docs')) {
   // A draft has no page in a production build, so it needs no card.
