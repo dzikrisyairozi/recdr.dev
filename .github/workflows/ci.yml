@@ -1,9 +1,9 @@
 name: CI
 
-# Runs on pull requests to main.
+# Runs on every pull request. The pull requests of a stacked branch target
+# the branch below, not main, and need the same checks.
 on:
   pull_request:
-    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
