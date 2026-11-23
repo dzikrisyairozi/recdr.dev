@@ -160,3 +160,13 @@ test('the docs home page has its own title and description', async ({
   );
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('recdr');
 });
+
+test('a docs page fetches its two fonts before it paints', async ({ page }) => {
+  // Fonts that arrive late make the text wrap again, which moves the page.
+  await page.goto('/docs/install/');
+  const preloads = await page
+    .locator('link[rel="preload"][as="font"]')
+    .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  expect(preloads).toHaveLength(2);
+  expect(preloads.join(' ')).toMatch(/geist-latin.*geist-mono-latin/);
+});
