@@ -53,3 +53,23 @@ test('the start page leads to Install and Quick start', async ({ page }) => {
     'Quick start',
   );
 });
+
+// One entry per page of the docs: its URL and its <h1>.
+const pages: [string, string][] = [
+  ['/docs/', 'recdr'],
+  ['/docs/install/', 'Install'],
+  ['/docs/quick-start/', 'Quick start'],
+  ['/docs/guides/browser-tabs/', 'Record a browser tab'],
+  ['/docs/guides/export/', 'Export part of a recording'],
+  ['/docs/guides/app/', 'The app'],
+];
+
+test('every docs page answers and has its title', async ({ page }) => {
+  for (const [url, title] of pages) {
+    const response = await page.goto(url);
+    expect(response?.status(), url).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 }), url).toHaveText(
+      title,
+    );
+  }
+});

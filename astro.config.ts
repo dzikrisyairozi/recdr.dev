@@ -26,6 +26,10 @@ export default defineConfig({
           label: 'Start here',
           items: ['docs', 'docs/install', 'docs/quick-start'],
         },
+        {
+          label: 'Guides',
+          items: [{ autogenerate: { directory: 'docs/guides' } }],
+        },
       ],
     }),
   ],
