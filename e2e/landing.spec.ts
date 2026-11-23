@@ -178,6 +178,15 @@ test('the header Install link leads to the install section', async ({
   await expect(page.locator('#install')).toContainText('MIT license');
 });
 
+test('a link to /#install from another page lands on the install section', async ({
+  page,
+}) => {
+  await page.goto('/#install');
+  // The pinned scenes add scroll height above #install after the load event.
+  await expect(page.locator('#how .pin-spacer')).toBeAttached();
+  await expect(page.locator('#install [data-install]')).toBeInViewport();
+});
+
 test('a click draws one ring, which is removed when it has faded', async ({
   page,
 }) => {

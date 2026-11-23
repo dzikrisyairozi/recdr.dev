@@ -13,6 +13,15 @@ export function initScrollScenes(): void {
   // resize would recompute the pins and make them jump.
   ScrollTrigger.config({ ignoreMobileResize: true });
 
+  // The pins add scroll height. A visitor who is already further down (they
+  // followed a link to /#install, or the browser restored their position)
+  // would now be looking at a section further up, so the section at the top
+  // of the window is put back where it was.
+  const anchor = [
+    ...document.querySelectorAll<HTMLElement>('main > section'),
+  ].find((section) => section.getBoundingClientRect().bottom > 0);
+  const anchorTop = anchor?.getBoundingClientRect().top ?? 0;
+
   // matchMedia removes the timelines and pins again if the visitor turns
   // reduced motion on while the page is open.
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
@@ -72,4 +81,13 @@ export function initScrollScenes(): void {
 
     return () => whySection?.removeAttribute('data-scene-active');
   });
+
+  if (anchor) {
+    // ScrollTrigger would add the pin spacers on its next tick.
+    ScrollTrigger.refresh();
+    window.scrollBy({
+      top: anchor.getBoundingClientRect().top - anchorTop,
+      behavior: 'instant',
+    });
+  }
 }
