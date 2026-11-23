@@ -95,3 +95,54 @@ video {
   opacity: 0;
   transform: translateY(1rem);
 }
+
+/* A page of text outside the landing page: the changelog, the blog. */
+.page {
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: var(--space-24) var(--space-4);
+}
+
+.page-title {
+  margin: 0 0 var(--space-6);
+  font-size: clamp(2.25rem, 8vw, var(--text-3xl));
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* HTML that comes from Markdown: a blog post, a release's notes. */
+.prose {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.prose :is(h1, h2, h3, h4) {
+  margin: var(--space-8) 0 var(--space-2);
+  color: var(--text);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.prose :is(p, ul, ol, pre) {
+  margin: 0 0 var(--space-4);
+}
+
+.prose :is(ul, ol) {
+  padding-inline-start: var(--space-6);
+}
+
+.prose code {
+  color: var(--text);
+  font-size: 0.9em;
+}
+
+.prose pre {
+  padding: var(--space-4);
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  /* Astro's highlighter sets its own background inline. */
+  background: var(--surface) !important;
+}

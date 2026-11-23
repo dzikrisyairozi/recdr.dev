@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import Site from '../../layouts/Site.astro';
+import { publishedPosts } from '../../lib/blog.ts';
+
+const posts = publishedPosts(await getCollection('blog'));
+---
+
+<Site title="Blog" description="News about recdr.">
+  <section class="page">
+    <h1 class="page-title">Blog</h1>
+    {posts.length === 0 ? (
+      <p>No posts yet.</p>
+    ) : (
+      <ul>
+        {posts.map((post) => (
+          <li>
+            <time datetime={post.data.date.toISOString()}>
+              {post.data.date.toISOString().slice(0, 10)}
+            </time>
+            <h2>
+              <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            </h2>
+            <p>{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</Site>
+
+<style>
+  ul {
+    margin: var(--space-12) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--border);
+  }
+
+  time {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  h2 {
+    margin: var(--space-1) 0;
+    font-size: var(--text-xl);
+    font-weight: 600;
+  }
+
+  h2 a {
+    text-decoration: none;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+</style>
