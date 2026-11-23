@@ -23,7 +23,7 @@ const releasesUrl = `https://github.com/${REPO}/releases`;
       </p>
     ) : (
       releases.map((release) => (
-        <article>
+        <article id={release.tag}>
           <header>
             <h2>
               <a href={release.url}>{release.tag}</a>

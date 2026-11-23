@@ -27,3 +27,11 @@ for (const path of ['/', '/docs/']) {
     await expect(page).toHaveURL(/\/changelog\/$/);
   });
 }
+
+test('a release can be linked to by its tag', async ({ page }) => {
+  await page.goto('/changelog/');
+  const release = page.locator('main article').first();
+  test.skip((await release.count()) === 0, 'built without network access');
+  const tag = await release.getByRole('heading', { level: 2 }).innerText();
+  await expect(release).toHaveAttribute('id', tag.trim());
+});
