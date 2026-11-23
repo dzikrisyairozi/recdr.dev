@@ -15,7 +15,9 @@ export function initInstallTabs(defaultId: InstallId): void {
         tab.tabIndex = selected ? 0 : -1;
         if (selected && focus) tab.focus();
       }
-      for (const panel of panels) panel.hidden = panel.dataset.panel !== id;
+      for (const panel of panels) {
+        panel.classList.toggle('shown', panel.dataset.panel === id);
+      }
     };
 
     tabs.forEach((tab, index) => {
@@ -31,7 +33,7 @@ export function initInstallTabs(defaultId: InstallId): void {
     });
 
     copy?.addEventListener('click', async () => {
-      const shown = panels.find((panel) => !panel.hidden);
+      const shown = panels.find((panel) => panel.classList.contains('shown'));
       const text = shown?.querySelector('code')?.textContent ?? '';
       let message = 'Copied';
       try {

@@ -66,6 +66,20 @@ test('Copy copies the command that is shown', async ({ page }) => {
   );
 });
 
+test('one install command shows, and the others are hidden by CSS only', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const install = page.locator('[data-install]').first();
+  // Text extractors drop nodes that carry the hidden attribute.
+  await expect(install.locator('[role="tabpanel"][hidden]')).toHaveCount(0);
+  await expect(install.locator('[role="tabpanel"]:visible')).toHaveCount(1);
+  await install.getByRole('tab', { name: 'cargo' }).click();
+  await expect(install.locator('[role="tabpanel"]:visible')).toHaveText(
+    /cargo install/,
+  );
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
