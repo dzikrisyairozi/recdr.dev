@@ -1,23 +1,24 @@
 import { getCollection } from 'astro:content';
 import { OGImageRoute } from 'astro-og-canvas';
 import { publishedPosts } from '../../lib/blog.ts';
+import { checkCard, type Card } from '../../lib/og.ts';
 
-type Card = { title: string; description?: string };
-
-// The key is the page's path without its slashes, so /docs/install/ has its
-// card at /og/docs/install.png. Site.astro and route-data.ts build the same
-// key from the URL.
+// The key is the page's path without its outer slashes, so /docs/install/
+// has its card at /og/docs/install.png. cardKey in src/lib/og.ts works the
+// same key out from a page's URL.
 const pages: Record<string, Card> = {
   index: { title: 'Screen recorder your agent can use.' },
   changelog: { title: 'Changelog' },
   blog: { title: 'Blog' },
 };
 for (const entry of await getCollection('docs')) {
-  pages[entry.id] = entry.data;
+  // A draft has no page in a production build, so it needs no card.
+  if (!entry.data.draft) pages[entry.id] = entry.data;
 }
 for (const post of publishedPosts(await getCollection('blog'))) {
   pages[`blog/${post.id}`] = post.data;
 }
+for (const [key, card] of Object.entries(pages)) checkCard(key, card);
 
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
