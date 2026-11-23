@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import manifest from '../src/assets/demo/manifest.json' with { type: 'json' };
+import { formatTimecode } from '../src/lib/timecode.ts';
 
 declare global {
   interface Window {
@@ -39,15 +41,17 @@ test('the right arrow key moves the scrubber to the next frame', async ({
     const top = document.querySelector('#frames')!.getBoundingClientRect().top;
     window.scrollTo(0, top + window.scrollY + window.innerHeight * 0.6);
   });
-  const buttons = page.locator('[data-scrub-strip] button');
+  const buttons = page.locator('#frames [data-scrub-strip] button');
   await expect(buttons.first()).toBeVisible();
 
-  const readout = page.locator('[data-scrub-readout]');
+  const readout = page.locator('#frames [data-scrub-readout]');
   await expect(readout).toContainText('frame 000001');
   await buttons.first().focus();
   await page.keyboard.press('ArrowRight');
-  // manifest.json has the second frame at 1583 ms.
-  await expect(readout).toContainText('frame 000002 · 00:01.6');
+  // The strip rounds a frame's time to the nearest tenth of a second.
+  const second = manifest.frames[1]!;
+  const time = formatTimecode(Math.round(second.t_ms / 100) * 100);
+  await expect(readout).toContainText(`frame 000002 · ${time}`);
   await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
 });
 

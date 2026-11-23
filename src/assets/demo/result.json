@@ -1,46 +1,59 @@
 {
-  "id": "20261123-124910-9341",
-  "dir": "D:\\recdr.dev\\.recdr\\20261123-124910-9341",
-  "stop_reason": "duration_reached",
-  "duration_ms": 6008,
-  "width": 960,
-  "height": 600,
-  "frames_stored": 19,
+  "id": "20261123-202425-a615",
+  "dir": "D:\\recdr.dev\\.recdr\\20261123-202425-a615",
+  "stop_reason": "stopped",
+  "duration_ms": 5654,
+  "width": 1280,
+  "height": 800,
+  "frames_stored": 23,
   "dropped_frames": 0,
   "keyframes": [
     {
       "t_ms": 0,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000001.png"
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000001.png"
     },
     {
-      "t_ms": 1583,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000002.png"
+      "t_ms": 1892,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000002.png"
     },
     {
-      "t_ms": 2296,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000012.png"
+      "t_ms": 2550,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000010.png"
     },
     {
-      "t_ms": 2297,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000013.png"
+      "t_ms": 2550,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000011.png"
     },
     {
-      "t_ms": 2505,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000014.png"
+      "t_ms": 2564,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000012.png"
     },
     {
-      "t_ms": 4080,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000018.png"
+      "t_ms": 2839,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000014.png"
     },
     {
-      "t_ms": 4325,
-      "path": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\frames\\000019.png"
+      "t_ms": 2876,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000015.png"
+    },
+    {
+      "t_ms": 3035,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000016.png"
+    },
+    {
+      "t_ms": 3483,
+      "path": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\frames\\000023.png"
     }
   ],
-  "marks": [],
-  "gif": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\recording.gif",
-  "mp4": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\recording.mp4",
-  "contact_sheet": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\contact_sheet.png",
-  "diff": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\diff.json",
-  "manifest": "D:\\recdr.dev\\.recdr\\20261123-124910-9341\\manifest.json"
+  "marks": [
+    {
+      "t_ms": 1867,
+      "label": "clicked Buy"
+    }
+  ],
+  "gif": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\recording.gif",
+  "mp4": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\recording.mp4",
+  "contact_sheet": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\contact_sheet.png",
+  "diff": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\diff.json",
+  "manifest": "D:\\recdr.dev\\.recdr\\20261123-202425-a615\\manifest.json"
 }
