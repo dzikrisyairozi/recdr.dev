@@ -49,7 +49,7 @@ test('the sections follow the hero in order', async ({ page }) => {
   const ids = await page
     .locator('main > section')
     .evaluateAll((sections) => sections.map((section) => section.id));
-  expect(ids).toEqual(['top', 'why', 'how', 'frames']);
+  expect(ids).toEqual(['top', 'why', 'how', 'frames', 'files']);
 });
 
 test('a section heading is revealed when it scrolls into view', async ({
@@ -91,4 +91,20 @@ test('the #how scene is pinned', async ({ page }) => {
   await page.goto('/');
   await page.locator('#how').scrollIntoViewIfNeeded();
   await expect(page.locator('#how .pin-spacer')).toBeAttached();
+});
+
+test('#files shows the six kinds of file a recording leaves', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const files = page.locator('#files');
+  await expect(files.getByRole('heading', { level: 3 })).toHaveText([
+    'frames/000001.png, ...',
+    'manifest.json',
+    'diff.json',
+    'contact_sheet.png',
+    'recording.gif, recording.mp4',
+    'result.json',
+  ]);
+  await expect(files.locator('pre').last()).toContainText('"stop_reason"');
 });

@@ -1,0 +1,202 @@
+---
+import { Image, getImage } from 'astro:assets';
+import {
+  contactSheet,
+  diff,
+  frames,
+  gif,
+  manifest,
+  mp4Url,
+  result,
+} from '../lib/demo-assets.ts';
+
+// The two logs list every frame. Two entries show their shape.
+const shown = 2;
+const json = (value: unknown) => JSON.stringify(value, null, 2);
+const manifestText = json({
+  ...manifest,
+  frames: manifest.frames.slice(0, shown),
+});
+const diffText = json({ ...diff, frames: diff.frames.slice(0, shown) });
+const cutNote = `${shown} of ${frames.length} frames shown`;
+
+const firstFrame = frames[0]!;
+// A still of the first frame: the video's poster, and what stands in for
+// the GIF under reduced motion.
+const still = await getImage({
+  src: firstFrame.image,
+  width: 960,
+  format: 'webp',
+});
+---
+
+<section id="files" class="section">
+  <h2 class="section-title" data-reveal>
+    What a recording leaves
+  </h2>
+  <div class="cards">
+    <article>
+      <h3>
+        <code>frames/000001.png, ...</code>
+      </h3>
+      <p>Each frame that differs from the one before it.</p>
+      <Image
+        src={firstFrame.image}
+        width={960}
+        alt="The first frame: the checkout page with its Buy button."
+        loading="lazy"
+      />
+    </article>
+    <article>
+      <h3>
+        <code>manifest.json</code>
+      </h3>
+      <p>
+        Size, fps, duration, each frame's time, marks, clicks, stop reason,
+        dropped frames.
+      </p>
+      <pre tabindex="0"><code>{manifestText}</code></pre>
+      <p class="note">{cutNote}</p>
+    </article>
+    <article>
+      <h3>
+        <code>diff.json</code>
+      </h3>
+      <p>
+        For each frame: the share of pixels that changed, the box around them,
+        and whether it is a keyframe.
+      </p>
+      <pre tabindex="0"><code>{diffText}</code></pre>
+      <p class="note">{cutNote}</p>
+    </article>
+    <article>
+      <h3>
+        <code>contact_sheet.png</code>
+      </h3>
+      <p>
+        Up to 12 keyframes in a grid, each labelled with its time and any marks.
+      </p>
+      <Image
+        src={contactSheet}
+        width={1216}
+        alt="The contact sheet: a grid of the recording's keyframes, each with its time."
+        loading="lazy"
+      />
+    </article>
+    <article class="wide">
+      <h3>
+        <code>recording.gif, recording.mp4</code>
+      </h3>
+      <p>
+        The formats asked for, with a ring drawn for 400 ms after each click.
+      </p>
+      <div class="media">
+        <picture>
+          <source media="(prefers-reduced-motion: reduce)" srcset={still.src} />
+          <img
+            src={gif.src}
+            width={gif.width}
+            height={gif.height}
+            alt="recording.gif: the Buy button is clicked, a bar fills and the toast Payment accepted comes and goes."
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+        <video
+          controls
+          muted
+          playsinline
+          preload="none"
+          src={mp4Url}
+          poster={still.src}
+          width={manifest.width}
+          height={manifest.height}
+          aria-label="recording.mp4, the same six seconds as a video"
+        ></video>
+      </div>
+    </article>
+    <article class="wide">
+      <h3>
+        <code>result.json</code>
+      </h3>
+      <p>
+        What <code>stop</code> and <code>record</code> print.
+      </p>
+      <pre tabindex="0"><code>{json(result)}</code></pre>
+    </article>
+  </div>
+</section>
+
+<style>
+  .cards {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  article {
+    min-width: 0;
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0 0 var(--space-4);
+    color: var(--text-muted);
+  }
+
+  p code {
+    color: var(--text);
+  }
+
+  .note {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+  }
+
+  article :global(img),
+  video {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  pre {
+    max-height: 20rem;
+    margin: 0;
+    padding: var(--space-4);
+    overflow: auto;
+    border-radius: 8px;
+    background: var(--bg);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
+  }
+
+  .media {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .cards {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .media {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
