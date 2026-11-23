@@ -110,3 +110,12 @@ test('an unknown path answers 404 with the custom page', async ({ page }) => {
     'Page not found',
   );
 });
+
+test('every page but the home page has the site name in its title', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page).not.toHaveTitle(/\| recdr$/);
+  await page.goto('/nowhere/');
+  await expect(page).toHaveTitle('Page not found | recdr');
+});
