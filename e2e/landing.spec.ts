@@ -21,3 +21,17 @@ test('the hero demo runs its timecode', async ({ page }) => {
     timeout: 6000,
   });
 });
+
+test('the right arrow key moves the scrubber to the next frame', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const readout = page.locator('[data-scrub-readout]');
+  await expect(readout).toContainText('frame 000001');
+  await page.locator('[data-scrub-strip] button').first().focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(readout).toContainText('frame 000002');
+  await expect(
+    page.locator('[data-scrub-strip] button').nth(1),
+  ).toHaveAttribute('aria-pressed', 'true');
+});

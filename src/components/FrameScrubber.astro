@@ -1,0 +1,168 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { frames } from '../lib/demo-assets.ts';
+
+const strip = await Promise.all(
+  frames.map(async (frame) => ({
+    ...frame,
+    full: (await getImage({ src: frame.image, width: 960, format: 'webp' }))
+      .src,
+    boxAttr: frame.box
+      ? `${frame.box.x},${frame.box.y},${frame.box.width},${frame.box.height}`
+      : '',
+  })),
+);
+const first = strip[0]!;
+---
+
+<section id="frames" class="section" data-scene="frames">
+  <div data-pin>
+    <h2 class="section-title" data-reveal>
+      Every frame that changed
+    </h2>
+    <div class="stage">
+      <img
+        data-scrub-image
+        src={first.full}
+        width="960"
+        height="600"
+        alt="The recorded checkout page at the selected frame"
+        loading="lazy"
+        decoding="async"
+      />
+      <div data-scrub-box hidden></div>
+    </div>
+    <output class="readout" data-scrub-readout>
+      frame {first.label} · {first.timecode} · {first.changed} changed
+    </output>
+    <div class="strip" data-scrub-strip>
+      {strip.map((frame, i) => (
+        <button
+          type="button"
+          aria-label={`Frame ${frame.label} at ${frame.timecode}`}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          data-full={frame.full}
+          data-label={frame.label}
+          data-timecode={frame.timecode}
+          data-changed={frame.changed}
+          data-box={frame.boxAttr}
+          data-keyframe={frame.keyframe ? '' : undefined}
+        >
+          <Image src={frame.image} width={160} alt="" loading="lazy" />
+          <span>{frame.timecode}</span>
+        </button>
+      ))}
+    </div>
+    <p class="note">
+      The red box is the area that changed, from <code>diff.json</code>. A red
+      dot marks a keyframe; the contact sheet shows up to 12 of them.
+    </p>
+  </div>
+</section>
+
+<script>
+  import { initScrubber } from '../scripts/scrubber.ts';
+
+  initScrubber();
+</script>
+
+<style>
+  /* Sized from the viewport height, so the heading, the frame and the strip
+     fit on one screen while the section is pinned. */
+  .stage {
+    position: relative;
+    width: min(100%, calc((100svh - 28rem) * 1.6));
+    min-width: min(100%, 20rem);
+    margin-inline: auto;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .stage img {
+    display: block;
+    width: 100%;
+  }
+
+  [data-scrub-box] {
+    position: absolute;
+    border: 2px solid var(--rec);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  .readout {
+    display: block;
+    margin-block: var(--space-4);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    padding: var(--space-1) var(--space-1) var(--space-3);
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
+  }
+
+  button {
+    flex: none;
+    width: 7rem;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button[aria-pressed='true'] {
+    border-color: var(--rec);
+    color: var(--text);
+  }
+
+  button :global(img) {
+    display: block;
+    width: 100%;
+  }
+
+  button span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding-block: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button[data-keyframe] span::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rec);
+  }
+
+  .note {
+    margin: var(--space-2) 0 0;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  @media (min-width: 48rem) {
+    button {
+      width: 10rem;
+    }
+  }
+</style>
