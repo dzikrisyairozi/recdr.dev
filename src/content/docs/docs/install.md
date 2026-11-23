@@ -7,13 +7,13 @@ sidebar:
 
 macOS and Linux:
 
-```
+```sh
 curl -fsSL https://recdr.dev/install.sh | sh
 ```
 
 Windows (PowerShell):
 
-```
+```powershell
 irm https://recdr.dev/install.ps1 | iex
 ```
 
@@ -21,8 +21,11 @@ The script downloads the build for your system from the latest GitHub release, c
 
 With Homebrew on macOS or Linux, or with cargo:
 
-```
+```sh
 brew install dzikrisyairozi/tap/recdr
+```
+
+```sh
 cargo install recdr
 ```
 
@@ -36,8 +39,11 @@ Both scripts read three environment variables:
 | `RECDR_INSTALL_DIR`  | see above                                          | Install into this folder. On Windows a folder set here is not added to `Path`.        |
 | `RECDR_RELEASE_BASE` | `https://github.com/dzikrisyairozi/recdr/releases` | Read releases from another address with the same layout. `recdr update` reads it too. |
 
-```
+```sh
 curl -fsSL https://recdr.dev/install.sh | RECDR_VERSION=0.1.0 sh
+```
+
+```powershell
 $env:RECDR_VERSION = '0.1.0'; irm https://recdr.dev/install.ps1 | iex
 ```
 

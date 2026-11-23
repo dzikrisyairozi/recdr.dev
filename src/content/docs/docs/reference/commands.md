@@ -5,6 +5,8 @@ sidebar:
   order: 1
 ---
 
+The commands of `recdr`, the targets they record, and the options of `record` and `start`.
+
 ```
 recdr windows                       List visible top-level windows
 recdr monitors                      List monitors

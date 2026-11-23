@@ -5,6 +5,8 @@ sidebar:
   order: 4
 ---
 
+The `code` values in the error a failed command prints, and what each one means.
+
 | Code                    | Meaning                                                                                                                      |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `usage`                 | Bad flags or arguments. Exit code 2.                                                                                         |
