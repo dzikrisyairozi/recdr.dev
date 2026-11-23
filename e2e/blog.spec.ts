@@ -68,3 +68,25 @@ test('/blog/ has a visible link to the feed', async ({ page }) => {
     page.getByRole('main').getByRole('link', { name: 'RSS feed' }),
   ).toHaveAttribute('href', '/blog/rss.xml');
 });
+
+test('a post describes itself to search engines as a BlogPosting', async ({
+  page,
+}) => {
+  await page.goto('/blog/introducing-recdr/');
+  const data: unknown = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ??
+      '',
+  );
+  expect(data).toMatchObject({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    datePublished: '2026-11-23',
+    url: 'https://recdr.dev/blog/introducing-recdr/',
+    author: { '@type': 'Organization', name: 'recdr' },
+  });
+  expect(data).toHaveProperty(
+    'description',
+    await page.locator('meta[name="description"]').getAttribute('content'),
+  );
+});

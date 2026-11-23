@@ -12,9 +12,14 @@ interface Props {
   description: string;
   /** True on a page that search engines should not list, such as the 404 page. */
   noindex?: boolean;
+  /**
+   * schema.org data about the page, written to the head as JSON-LD. Each "<"
+   * is written as its JSON escape, so no text in it can close the script tag.
+   */
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // The home page's title already starts with the name.
 const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
@@ -34,6 +39,13 @@ const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
     )}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {jsonLd && (
+      <script
+        type="application/ld+json"
+        is:inline
+        set:html={JSON.stringify(jsonLd).replaceAll('<', '\\u003c')}
+      />
+    )}
     <link
       rel="alternate"
       type="application/rss+xml"
