@@ -40,6 +40,14 @@ const beats = [
 </section>
 
 <style>
+  /* One screen tall with the steps in the middle, so the pinned scene
+     does not leave the lower half of the screen empty. */
+  [data-pin] {
+    display: grid;
+    align-content: center;
+    min-height: calc(100svh - 2 * var(--space-24));
+  }
+
   .track {
     height: 2px;
     margin-bottom: var(--space-8);

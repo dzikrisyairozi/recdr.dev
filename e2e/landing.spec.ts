@@ -26,14 +26,22 @@ test('the right arrow key moves the scrubber to the next frame', async ({
   page,
 }) => {
   await page.goto('/');
+  // The pinned scene brings the strip's buttons in over 60% of a viewport
+  // height of scrolling. Before that they cannot take focus.
+  await expect(page.locator('#frames .pin-spacer')).toBeAttached();
+  await page.evaluate(() => {
+    const top = document.querySelector('#frames')!.getBoundingClientRect().top;
+    window.scrollTo(0, top + window.scrollY + window.innerHeight * 0.6);
+  });
+  const buttons = page.locator('[data-scrub-strip] button');
+  await expect(buttons.first()).toBeVisible();
+
   const readout = page.locator('[data-scrub-readout]');
   await expect(readout).toContainText('frame 000001');
-  await page.locator('[data-scrub-strip] button').first().focus();
+  await buttons.first().focus();
   await page.keyboard.press('ArrowRight');
   await expect(readout).toContainText('frame 000002');
-  await expect(
-    page.locator('[data-scrub-strip] button').nth(1),
-  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('the sections follow the hero in order', async ({ page }) => {
@@ -50,6 +58,37 @@ test('a section heading is revealed when it scrolls into view', async ({
   await page.goto('/');
   const heading = page.locator('#how h2');
   await expect(heading).not.toHaveAttribute('data-revealed');
+  // The pinned scenes add a screen of scrolling above #how when they start,
+  // so scroll only once they are in place.
+  await expect(page.locator('#how .pin-spacer')).toBeAttached();
   await heading.scrollIntoViewIfNeeded();
   await expect(heading).toHaveAttribute('data-revealed');
+});
+
+test('the scroll scenes are requested after the load event', async ({
+  page,
+}) => {
+  await page.goto('/');
+  // The browser's own timings: when the chunk was requested, and when the
+  // load event started.
+  const timing = await page.waitForFunction(() => {
+    const chunk = performance
+      .getEntriesByType('resource')
+      .find((entry) => entry.name.includes('scroll-scenes'));
+    const [navigation] = performance.getEntriesByType('navigation');
+    if (!chunk || !navigation) return null;
+    return {
+      requested: chunk.startTime,
+      load: (navigation as PerformanceNavigationTiming).loadEventStart,
+    };
+  });
+  const { requested, load } = (await timing.jsonValue())!;
+  expect(load).toBeGreaterThan(0);
+  expect(requested).toBeGreaterThanOrEqual(load);
+});
+
+test('the #how scene is pinned', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#how').scrollIntoViewIfNeeded();
+  await expect(page.locator('#how .pin-spacer')).toBeAttached();
 });

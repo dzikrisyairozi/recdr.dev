@@ -17,7 +17,22 @@ import Site from '../layouts/Site.astro';
 </Site>
 
 <script>
+  import { prefersReducedMotion } from '../scripts/motion.ts';
   import { initReveals } from '../scripts/reveal.ts';
 
   initReveals();
+
+  // GSAP only drives sections below the hero, so it is fetched after the
+  // load event and the headline and install command render without it.
+  if (!prefersReducedMotion()) {
+    window.addEventListener(
+      'load',
+      async () => {
+        const { initScrollScenes } =
+          await import('../scripts/scroll-scenes.ts');
+        initScrollScenes();
+      },
+      { once: true },
+    );
+  }
 </script>
