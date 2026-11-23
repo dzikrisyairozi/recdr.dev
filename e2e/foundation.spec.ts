@@ -13,7 +13,7 @@ test('the home page renders without errors', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Screen recordings your agent can read.',
+    'Screen recorder your agent can use.',
   );
   expect(errors).toEqual([]);
 });
