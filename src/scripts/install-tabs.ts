@@ -1,6 +1,6 @@
 import type { InstallId } from '../lib/install.ts';
 
-/** Turns every [data-install] block into tabs with a Copy button. */
+/** Wires the tabs and the Copy button of every [data-install] block. */
 export function initInstallTabs(defaultId: InstallId): void {
   for (const root of document.querySelectorAll<HTMLElement>('[data-install]')) {
     const tabs = [...root.querySelectorAll<HTMLElement>('[role="tab"]')];
@@ -47,7 +47,6 @@ export function initInstallTabs(defaultId: InstallId): void {
       }, 2000);
     });
 
-    root.dataset.enhanced = '';
     select(defaultId);
   }
 }
