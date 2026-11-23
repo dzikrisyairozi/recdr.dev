@@ -46,7 +46,8 @@ test('the right arrow key moves the scrubber to the next frame', async ({
   await expect(readout).toContainText('frame 000001');
   await buttons.first().focus();
   await page.keyboard.press('ArrowRight');
-  await expect(readout).toContainText('frame 000002');
+  // manifest.json has the second frame at 1583 ms.
+  await expect(readout).toContainText('frame 000002 · 00:01.6');
   await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
 });
 
