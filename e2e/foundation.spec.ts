@@ -84,6 +84,13 @@ test('the build output has both install redirects', () => {
   );
 });
 
+test('the build output keeps pages.dev deployments out of search', () => {
+  const headers = readFileSync('dist/_headers', 'utf8');
+  expect(headers).toContain(
+    'https://:project.pages.dev/*\n  X-Robots-Tag: noindex',
+  );
+});
+
 test('the header timecode counts up', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('[data-rec-timecode]').first()).not.toHaveText(

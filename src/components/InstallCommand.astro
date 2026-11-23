@@ -7,14 +7,13 @@ interface Props {
 }
 
 const { idPrefix } = Astro.props;
+
+// The HTML already is the tabbed layout with the first command selected, so
+// nothing moves when the script starts (the page's layout shift is measured).
+// The script only picks the tab for the visitor's system. Without JavaScript
+// the <noscript> styles show all four commands, each under its label.
 ---
 
-<!--
-  The HTML already is the tabbed layout with the first command selected, so
-  nothing moves when the script starts (the page's layout shift is measured).
-  The script only picks the tab for the visitor's system. Without JavaScript
-  the <noscript> styles show all four commands, each under its label.
--->
 <div class="install-command" data-install>
   <div class="tabs" role="tablist" aria-label="Install method">
     {installCommands.map((command, i) => (

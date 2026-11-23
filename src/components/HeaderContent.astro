@@ -19,6 +19,16 @@ const links: { href: string; label: string }[] = [
         </li>
       ))}
     </ul>
+    <details class="menu">
+      <summary>Menu</summary>
+      <ul>
+        {links.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </details>
   </nav>
   <slot name="search" />
   <span class="rec" aria-hidden="true">
@@ -30,16 +40,6 @@ const links: { href: string; label: string }[] = [
   <a class="install" href="/#install">
     Install
   </a>
-  <details class="menu">
-    <summary>Menu</summary>
-    <ul>
-      {links.map((link) => (
-        <li>
-          <a href={link.href}>{link.label}</a>
-        </li>
-      ))}
-    </ul>
-  </details>
 </div>
 
 <script>
@@ -122,12 +122,19 @@ const links: { href: string; label: string }[] = [
   }
 
   .install:hover {
-    background: #fff;
+    background: var(--white);
     color: var(--bg);
+  }
+
+  /* The nav holds the links and, on a phone, the menu. Its box is left out
+     so both sit in the bar, and the menu goes to the end of it. */
+  nav {
+    display: contents;
   }
 
   .menu {
     position: relative;
+    order: 1;
   }
 
   .menu summary {
