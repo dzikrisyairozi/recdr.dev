@@ -1,7 +1,15 @@
 ---
 // Rendered inside <header> by Site.astro, and inside Starlight's own
 // <header> on docs pages, so it styles itself and brings no wrapper element.
-import { siteLinks as links } from '../lib/site-links.ts';
+import { getStarLabel } from '../lib/site-data.ts';
+import { siteLinks } from '../lib/site-links.ts';
+
+// null while the repository has no stars, or when GitHub could not be read.
+const stars = await getStarLabel();
+const links = siteLinks.map((link) => ({
+  ...link,
+  count: link.label === 'GitHub' ? stars : null,
+}));
 ---
 
 <div class="bar">
@@ -13,7 +21,17 @@ import { siteLinks as links } from '../lib/site-links.ts';
     <ul class="links">
       {links.map((link) => (
         <li>
-          <a href={link.href}>{link.label}</a>
+          <a
+            href={link.href}
+            aria-label={link.count ? `GitHub, ${link.count} stars` : undefined}
+          >
+            {link.label}
+            {link.count && (
+              <span class="count" title="Stars on GitHub">
+                {link.count}
+              </span>
+            )}
+          </a>
         </li>
       ))}
     </ul>
@@ -22,7 +40,19 @@ import { siteLinks as links } from '../lib/site-links.ts';
       <ul>
         {links.map((link) => (
           <li>
-            <a href={link.href}>{link.label}</a>
+            <a
+              href={link.href}
+              aria-label={
+                link.count ? `GitHub, ${link.count} stars` : undefined
+              }
+            >
+              {link.label}
+              {link.count && (
+                <span class="count" title="Stars on GitHub">
+                  {link.count}
+                </span>
+              )}
+            </a>
           </li>
         ))}
       </ul>
@@ -89,6 +119,12 @@ import { siteLinks as links } from '../lib/site-links.ts';
   .menu a {
     display: block;
     padding-block: var(--space-3);
+  }
+
+  .count {
+    margin-inline-start: var(--space-1);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .rec {
