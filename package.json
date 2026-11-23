@@ -47,7 +47,7 @@
     "@eslint/js": "^10",
     "@lhci/cli": "^0.16",
     "@playwright/test": "~1.65",
-    "@types/node": "^24",
+    "@types/node": "^26",
     "eslint": "^10",
     "eslint-plugin-astro": "^3",
     "husky": "^9",
