@@ -21,7 +21,12 @@ export default defineConfig({
         ThemeProvider: './src/components/starlight/ThemeProvider.astro',
         ThemeSelect: './src/components/starlight/ThemeSelect.astro',
       },
-      sidebar: [{ label: 'Start here', items: ['docs'] }],
+      sidebar: [
+        {
+          label: 'Start here',
+          items: ['docs', 'docs/install', 'docs/quick-start'],
+        },
+      ],
     }),
   ],
 });

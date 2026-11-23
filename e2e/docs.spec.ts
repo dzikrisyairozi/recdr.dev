@@ -31,3 +31,25 @@ test('the docs share the header and footer of the site', async ({ page }) => {
     page.getByText('recdr is open source under the MIT license.'),
   ).toBeVisible();
 });
+
+test('the header links to the docs from the landing page', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+  await page
+    .getByRole('banner')
+    .getByRole('link', { name: 'Docs', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/docs\/$/);
+});
+
+test('the start page leads to Install and Quick start', async ({ page }) => {
+  await page.goto('/docs/');
+  const content = page.locator('.sl-markdown-content');
+  await content.getByRole('link', { name: 'Install' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Install');
+  await page.goto('/docs/');
+  await content.getByRole('link', { name: 'Quick start' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Quick start',
+  );
+});

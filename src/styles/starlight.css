@@ -22,3 +22,13 @@
 .sl-markdown-content a:hover {
   color: var(--rec);
 }
+
+/* A long value in a table cell, such as a URL, breaks so that it does not
+   squeeze the other columns. The first column holds names, which stay whole. */
+.sl-markdown-content td code {
+  overflow-wrap: anywhere;
+}
+
+.sl-markdown-content td:first-child code {
+  white-space: nowrap;
+}
