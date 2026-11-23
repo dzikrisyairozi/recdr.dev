@@ -23,6 +23,7 @@ restructuring, delete anything now unused. No ghosts in the project.
 Never attempt multi-file refactors in a single response. Break work into
 explicit phases. Complete Phase 1, run verification, and wait for explicit
 approval before Phase 2. Each phase must touch no more than 5 files.
+Deleting a whole directory counts as one file.
 
 ### Plan and Build Are Separate Steps
 
@@ -85,9 +86,9 @@ do not check if the code compiles. You are FORBIDDEN from reporting a task
 as complete until you have run:
 
 - `pnpm type-check` (TypeScript strict mode)
-- `pnpm lint` (ESLint across all packages)
-- `pnpm test` (full test suite)
-- For Rust changes: `cargo check && cargo clippy -- -D warnings && cargo test` inside `apps/api`
+- `pnpm lint` (ESLint)
+- `pnpm test` (unit tests)
+- `pnpm test:e2e` (Playwright)
 
 If any of these fail, fix the errors before reporting completion. Never say
 "Done!" with errors outstanding. Ask yourself: "Would a staff engineer
@@ -263,10 +264,10 @@ breaking it into smaller focused files. Keep the project navigable.
 
 ### Cross-App Awareness
 
-This is a monorepo. Changes to shared packages (`@repo/ui`, `@repo/i18n`,
-`@repo/api-types`, `@repo/tailwind-config`) affect multiple apps. After
-modifying a shared package, verify downstream consumers still build:
-`pnpm build`.
+This repository is a single Astro app with no shared packages.
+`src/components/HeaderContent.astro`, `src/components/FooterContent.astro`
+and `src/styles/tokens.css` show on every page, including the docs, so run
+`pnpm build` and `pnpm test:e2e` after changing them.
 
 ---
 
@@ -274,109 +275,76 @@ modifying a shared package, verify downstream consumers still build:
 
 ### Commands
 
-#### Root (runs across all workspaces via Turborepo)
-
 ```bash
-pnpm dev              # Start all apps
-pnpm build            # Build all packages
-pnpm lint             # Lint all packages
-pnpm lint:fix         # Auto-fix lint issues
-pnpm type-check       # TypeScript type checking
-pnpm format           # Format with Prettier
-pnpm format:check     # Check formatting
-pnpm check-all        # type-check + lint + format:check
-pnpm test             # Run tests for every workspace that defines one
-                       # (currently: apps/api, apps/dashboard, packages/ui —
-                       # apps/web and apps/docs have no test script yet, so
-                       # turbo silently skips them rather than failing)
-pnpm clean            # Clean build artifacts
+pnpm dev              # Astro dev server → http://localhost:4321
+pnpm build            # Static build to dist/
+pnpm preview          # Serve dist/ → http://localhost:4321
+pnpm type-check       # astro check (.astro and .ts files)
+pnpm lint             # ESLint
+pnpm lint:fix         # ESLint with --fix
+pnpm format           # Prettier, write
+pnpm format:check     # Prettier, check
+pnpm test             # Unit tests: node --test "src/**/*.test.ts"
+pnpm test:e2e         # Playwright; builds and previews the site first
+pnpm lhci             # Lighthouse CI against dist/
+pnpm check-all        # type-check + lint + format:check + test
 ```
 
-#### Per-app dev servers
-
-```bash
-pnpm dev:web          # Next.js web → http://localhost:3000
-pnpm dev:api          # Rust API → http://localhost:3001
-pnpm dev:docs         # Docs → http://localhost:3002
-pnpm dev:dashboard    # Dashboard → http://localhost:5174
-```
-
-#### Rust API (run inside `apps/api`)
-
-```bash
-cargo test            # Run tests
-cargo test <name>     # Run a single test
-cargo clippy -- -D warnings   # Lint
-cargo check           # Fast compile check
-```
-
-#### Database (from root)
-
-```bash
-pnpm db:migrate       # Run migrations
-pnpm db:seed          # Seed database
-pnpm db:reset         # Reset database
-pnpm db:studio        # Open DB studio
-```
-
-#### TypeScript type generation from Rust
-
-```bash
-pnpm db:generate      # Regenerates @repo/api-types from Rust structs (via ts-rs)
-```
+Before the first `pnpm test:e2e` on a machine:
+`pnpm exec playwright install chromium webkit`.
 
 ### Architecture
 
-This is a **Turborepo + pnpm workspaces** monorepo with four apps and six shared packages.
+One static Astro 7 site for recdr.dev, deployed to Cloudflare Pages. There is
+no server, no database and no workspace package. The spec,
+`spec/1-recdr-dev-site/spec.md`, is not in the repository: `spec/` and
+`tasks/` are git-ignored and exist only on the author's machine.
 
-#### Apps
+| Path                     | Purpose                                                 |
+| ------------------------ | ------------------------------------------------------- |
+| `astro.config.ts`        | Site URL, trailing slashes, integrations                |
+| `public/`                | Files served as they are: `_redirects`, `robots.txt`    |
+| `src/pages/`             | One file per route                                      |
+| `src/layouts/Site.astro` | Document shell for every page outside the docs          |
+| `src/components/`        | Astro components                                        |
+| `src/lib/`               | Pure TypeScript with a `*.test.ts` next to each module  |
+| `src/scripts/`           | Browser code, imported from a component's `<script>`    |
+| `src/styles/`            | `tokens.css` (design tokens) and `global.css`           |
+| `src/content/`           | Markdown for the docs and the blog                      |
+| `src/assets/demo/`       | One real recdr recording, shown on the landing page     |
+| `demo/`                  | The page that was recorded, and the script that records |
+| `e2e/`                   | Playwright tests                                        |
 
-| App              | Tech                                               | Port |
-| ---------------- | -------------------------------------------------- | ---- |
-| `apps/web`       | Next.js 16, React 19, Three.js, Framer Motion      | 3000 |
-| `apps/api`       | Rust, Axum, SQLx, PostgreSQL                       | 3001 |
-| `apps/docs`      | Next.js 16, Fumadocs (MDX)                         | 3002 |
-| `apps/dashboard` | Vite, React, TanStack Router, React Query, Zustand | 5174 |
+### Conventions
 
-#### Shared Packages
+- English only and dark only. No light theme, no language switch.
+- No React, no Tailwind. Plain CSS with the tokens in `src/styles/tokens.css`,
+  and TypeScript in a component's `<script>`.
+- `HeaderContent.astro` and `FooterContent.astro` also render on docs pages,
+  where `global.css` is not loaded, so they carry their own styles.
+- Every animation has a reduced-motion state, and every page reads without
+  JavaScript.
+- Every claim about recdr must match the README of
+  [dzikrisyairozi/recdr](https://github.com/dzikrisyairozi/recdr). Images shown
+  as recdr output come from `src/assets/demo/` and are not retouched.
+- Unit tests run on Node's own test runner. Relative imports of `.ts` files
+  carry the extension, enums are not allowed, and a test cannot import
+  `astro:*` modules.
+- In `.astro` files close every tag. Astro removes whitespace between inline
+  elements on separate lines; write `{' '}` where a space is needed.
 
-| Package                   | Purpose                                                           |
-| ------------------------- | ----------------------------------------------------------------- |
-| `@repo/ui`                | 40+ shadcn/ui components (Radix UI + Tailwind)                    |
-| `@repo/i18n`              | i18next config, provider, and locale files (English + Indonesian) |
-| `@repo/api-types`         | TypeScript types auto-generated from Rust via `ts-rs`             |
-| `@repo/tailwind-config`   | Shared Tailwind v4 theme and global CSS                           |
-| `@repo/eslint-config`     | ESLint configs: `base`, `next-js`, `react-internal`               |
-| `@repo/typescript-config` | TSConfigs: `base`, `nextjs`, `react-library`                      |
+### Environment Variables
 
-#### Type Safety Pipeline (Rust → TypeScript)
+None is required. `GITHUB_TOKEN`, when set at build time, raises the GitHub
+API limit for the changelog and the star count. A build without network access
+still passes.
 
-The Rust API uses `ts-rs` macros to derive TypeScript types from Rust structs. Running `pnpm db:generate` exports these to `@repo/api-types`, which all frontend apps consume. When modifying Rust API types, regenerate before updating frontend code.
+### Deployment
 
-#### Key Design Patterns
-
-- **Frontend data fetching:** React Query for server state; Zustand for local/UI state
-- **Routing (dashboard):** TanStack Router (file-based, type-safe)
-- **Styling:** Tailwind CSS v4 shared via `@repo/tailwind-config`; components via `@repo/ui`
-- **i18n:** Wrap apps in the `@repo/i18n` provider; add translations to both `en` and `id` locale files
-- **API CORS:** Configured in Axum middleware; `NEXT_PUBLIC_API_URL` must be set in web `.env`
-
-#### Environment Variables
-
-API (`apps/api/.env`):
-
-```
-DATABASE_URL=postgresql://postgres:password@localhost:5432/monorepo_starter
-HOST=0.0.0.0
-PORT=3001
-RUST_LOG=api=debug,tower_http=debug,sqlx=warn
-```
-
-Web (`apps/web/.env`):
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
+Cloudflare Pages builds `main` with `pnpm build` and serves `dist/`. The
+project sets `PNPM_VERSION=9.6.0`; Node comes from `.node-version`. The owner
+manages the Cloudflare project and DNS. Do not create, change or delete
+anything there.
 
 ### Commit Convention
 

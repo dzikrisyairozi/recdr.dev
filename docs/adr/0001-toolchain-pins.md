@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted. The ESLint pin was removed in November 2026; see Update.
 
 ## Context
 
@@ -46,3 +46,16 @@ those majors regardless of what the weekly group would otherwise bundle.
 - Whoever removes this pin should re-run the same verification `2adfa16` did: a full
   `pnpm build && pnpm lint && pnpm type-check && pnpm test` across every workspace,
   not just a version bump.
+
+## Update, November 2026
+
+The template this repository started from was replaced by one Astro site,
+and the two pins were looked at again.
+
+- **ESLint.** The pin existed for `eslint-plugin-react`, which came in through
+  `eslint-config-next`. Both left with the template. `eslint-plugin-astro` 3
+  needs ESLint 10 or later, so the site uses ESLint 10 and the `eslint` entry is
+  gone from `.github/dependabot.yml`.
+- **TypeScript.** The pin stays at 6.0.3. `typescript-eslint` 8 accepts
+  TypeScript below 6.1, and `@astrojs/check` accepts TypeScript 5 or 6. The
+  `typescript` entry stays in `.github/dependabot.yml`.

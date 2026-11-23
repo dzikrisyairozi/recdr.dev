@@ -1,0 +1,4 @@
+# Every deployment also answers on <name>.pages.dev. Those copies stay out
+# of search results; recdr.dev is the one address.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

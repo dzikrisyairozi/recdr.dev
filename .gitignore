@@ -1,55 +1,17 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# Dependencies
 node_modules
-.pnp
-.pnp.js
-
-# Local env files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Testing
-coverage
-
-# Turbo
-.turbo
-
-# Vercel
-.vercel
-
-# Build Outputs
-.next/
-out/
-build
-dist
-**/target/
-
-# Rust / ts-rs generated bindings
-apps/api/bindings/
-
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Misc
+.env.*
 .DS_Store
 *.pem
-
-./generated
 .claude/
-
 .serena/
+dist/
+.astro/
+test-results/
+playwright-report/
+.lighthouseci/
+.recdr/
 
-# tasks/ is per-feature execution scratch (task checklists, status) with no
-# lasting value once a PR merges, so it's gitignored. spec/ is deliberately
-# NOT gitignored - it documents lasting design decisions (scope, acceptance
-# criteria, rationale) worth keeping in history alongside the code it
-# describes, unlike a todo list.
-/tasks/
+# Specs, task lists and build evidence stay on the author's machine.
 /spec/
+/tasks/

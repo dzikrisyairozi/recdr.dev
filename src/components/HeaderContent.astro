@@ -1,0 +1,176 @@
+---
+// Rendered inside <header> by Site.astro, and inside Starlight's own
+// <header> on docs pages, so it styles itself and brings no wrapper element.
+const links: { href: string; label: string }[] = [
+  { href: 'https://github.com/dzikrisyairozi/recdr', label: 'GitHub' },
+];
+---
+
+<div class="bar">
+  <a class="brand" href="/">
+    <img src="/favicon.svg" alt="" width="28" height="28" />
+    <span>recdr</span>
+  </a>
+  <nav aria-label="Main">
+    <ul class="links">
+      {links.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))}
+    </ul>
+    <details class="menu">
+      <summary>Menu</summary>
+      <ul>
+        {links.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  </nav>
+  <slot name="search" />
+  <span class="rec" aria-hidden="true">
+    <span class="rec-dot"></span>
+    <span class="rec-time" data-rec-timecode>
+      00:00.0
+    </span>
+  </span>
+  <a class="install" href="/#install">
+    Install
+  </a>
+</div>
+
+<script>
+  import { initRecTimecode } from '../scripts/rec-timecode.ts';
+
+  initRecTimecode();
+</script>
+
+<style>
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+  }
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--rec);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-inline-end: auto;
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links {
+    display: none;
+    gap: var(--space-6);
+  }
+
+  .links a,
+  .menu a {
+    display: block;
+    padding-block: var(--space-3);
+  }
+
+  .rec {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rec-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rec);
+  }
+
+  .rec-time {
+    display: none;
+  }
+
+  .install {
+    padding: var(--space-2) var(--space-4);
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 500;
+  }
+
+  .install:hover {
+    background: var(--white);
+    color: var(--bg);
+  }
+
+  /* The nav holds the links and, on a phone, the menu. Its box is left out
+     so both sit in the bar, and the menu goes to the end of it. */
+  nav {
+    display: contents;
+  }
+
+  .menu {
+    position: relative;
+    order: 1;
+  }
+
+  .menu summary {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .menu ul {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    min-width: 10rem;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  @media (min-width: 48rem) {
+    .links {
+      display: flex;
+    }
+
+    .rec-time {
+      display: inline;
+    }
+
+    .menu {
+      display: none;
+    }
+  }
+</style>

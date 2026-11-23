@@ -1,0 +1,148 @@
+---
+import { installCommands } from '../lib/install.ts';
+
+interface Props {
+  // The landing page has two of these, and element ids must be unique.
+  idPrefix: string;
+}
+
+const { idPrefix } = Astro.props;
+
+// The HTML already is the tabbed layout with the first command selected, so
+// nothing moves when the script starts (the page's layout shift is measured).
+// The script only picks the tab for the visitor's system. Without JavaScript
+// the <noscript> styles show all four commands, each under its label.
+---
+
+<div class="install-command" data-install>
+  <div class="tabs" role="tablist" aria-label="Install method">
+    {installCommands.map((command, i) => (
+      <button
+        type="button"
+        role="tab"
+        data-tab={command.id}
+        id={`${idPrefix}-tab-${command.id}`}
+        aria-controls={`${idPrefix}-panel-${command.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? 0 : -1}
+      >
+        {command.label}
+      </button>
+    ))}
+  </div>
+  <div class="body">
+    <div class="panels">
+      {installCommands.map((command, i) => (
+        <div
+          class="panel"
+          role="tabpanel"
+          data-panel={command.id}
+          id={`${idPrefix}-panel-${command.id}`}
+          aria-labelledby={`${idPrefix}-tab-${command.id}`}
+          hidden={i !== 0}
+        >
+          <span class="panel-label">{command.label}</span>
+          <pre tabindex="0"><code>{command.text}</code></pre>
+        </div>
+      ))}
+    </div>
+    <button type="button" class="copy" data-copy>
+      Copy
+    </button>
+  </div>
+  <span class="visually-hidden" aria-live="polite" data-copy-status></span>
+  <noscript>
+    <style is:inline>
+      [data-install] .tabs[role='tablist'],
+      [data-install] .body [data-copy] {
+        display: none;
+      }
+
+      [data-install] .panels [role='tabpanel'][hidden],
+      [data-install] .panels .panel-label {
+        display: block;
+      }
+    </style>
+  </noscript>
+</div>
+
+<script>
+  import { tabForPlatform } from '../lib/install.ts';
+  import { initInstallTabs } from '../scripts/install-tabs.ts';
+
+  initInstallTabs(tabForPlatform(navigator.platform));
+</script>
+
+<style>
+  .install-command {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-align: left;
+  }
+
+  .tabs {
+    display: flex;
+    gap: var(--space-1);
+    padding-inline: var(--space-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  [role='tab'] {
+    padding: var(--space-3);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  [role='tab'][aria-selected='true'] {
+    border-bottom-color: var(--rec);
+    color: var(--text);
+  }
+
+  .body {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-inline-end: var(--space-2);
+  }
+
+  .panels {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .panel {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* Only the <noscript> styles show the label. */
+  .panel-label {
+    display: none;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  pre {
+    margin: 0;
+    overflow-x: auto;
+    font-size: var(--text-sm);
+    line-height: 2;
+  }
+
+  .copy {
+    min-width: 4.5rem;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+</style>

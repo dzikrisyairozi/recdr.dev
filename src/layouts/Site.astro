@@ -1,0 +1,93 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import HeaderContent from '../components/HeaderContent.astro';
+import FooterContent from '../components/FooterContent.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** True on a page that search engines should not list, such as the 404 page. */
+  noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// The home page's title already starts with the name.
+const pageTitle = Astro.url.pathname === '/' ? title : `${title} | recdr`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <link rel="canonical" href={canonical} />
+    )}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- The headline is set in Geist. Fetched early, the font is there for
+         the first paint and the text does not reflow when it arrives. -->
+    <link
+      rel="preload"
+      href={geistLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <header class="site-header">
+      <div class="inner">
+        <HeaderContent />
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="inner">
+        <FooterContent />
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .inner {
+    max-width: var(--content-width);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--header-height);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .site-header .inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .site-footer {
+    padding-block: var(--space-8);
+    border-top: 1px solid var(--border);
+  }
+</style>
