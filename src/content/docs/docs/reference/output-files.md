@@ -1,6 +1,6 @@
 ---
 title: 'What a recording leaves'
-description: 'A recording lives in <out>/<id>/.'
+description: 'The files recdr writes for each recording: the frames as PNG, manifest.json, diff.json, contact_sheet.png, the GIF or MP4, and result.json.'
 sidebar:
   order: 2
 ---

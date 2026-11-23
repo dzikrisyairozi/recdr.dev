@@ -1,6 +1,6 @@
 ---
 title: 'Commands'
-description: 'Every command prints one JSON object on stdout and exits 0.'
+description: 'Every recdr command, the targets you can record (a window, a region, a monitor or a browser tab), the options of record and start, and examples.'
 sidebar:
   order: 1
 ---

@@ -1,6 +1,6 @@
 ---
 title: 'Limits'
-description: 'On Windows 10 the system draws a yellow border around the captured window or monitor, and it cannot be turned off there.'
+description: 'Known limits of recdr on Windows, macOS and Linux: what captures as black, when clicks get no ring, what is never recorded, and what has not been tested.'
 sidebar:
   order: 5
 ---
