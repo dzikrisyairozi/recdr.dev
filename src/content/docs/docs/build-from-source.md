@@ -1,6 +1,6 @@
 ---
 title: 'Build from source'
-description: 'For contributors, or to run recdr from a checkout.'
+description: 'Build recdr from a checkout with cargo: the Rust version and operating systems it needs, the MP4 encoder on each platform, and how to run the tests.'
 sidebar:
   order: 4
 ---

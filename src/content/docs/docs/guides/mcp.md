@@ -1,6 +1,6 @@
 ---
 title: 'MCP'
-description: 'Register the server with Claude Code.'
+description: 'Register the recdr MCP server with Claude Code, and see the ten tools it offers, from list_windows to export, and what they return.'
 sidebar:
   order: 4
 ---

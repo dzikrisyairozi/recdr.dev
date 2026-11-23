@@ -1,6 +1,6 @@
 ---
 title: 'Install'
-description: 'The script downloads the build for your system from the latest GitHub release, checks its SHA-256, and puts recdr in ~/.local/bin.'
+description: 'Install recdr with one command on macOS, Linux or Windows, or with Homebrew or cargo. Also covers updating, the install variables and uninstalling.'
 sidebar:
   order: 2
 ---
