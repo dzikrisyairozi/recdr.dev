@@ -28,7 +28,7 @@ const releasesUrl = `https://github.com/${REPO}/releases`;
             <h2>
               <a href={release.url}>{release.tag}</a>
             </h2>
-            <time datetime={release.date}>{release.date.slice(0, 10)}</time>
+            <time datetime={release.date}>{release.date.slice(0, 10)}</time>{' '}
             {release.prerelease && <span class="pre">Pre-release</span>}
           </header>
           <div class="notes" set:html={release.html} />

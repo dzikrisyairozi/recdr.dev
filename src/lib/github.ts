@@ -14,7 +14,7 @@ export type Release = {
 /** The part of `fetch` this module uses, so a test can pass its own. */
 export type FetchLike = (
   url: string,
-  init: { headers: Record<string, string> },
+  init: { headers: Record<string, string>; signal: AbortSignal },
 ) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
 
 const API = `https://api.github.com/repos/${REPO}`;
@@ -28,7 +28,9 @@ async function getJson(
   const request = (authorization?: string) => {
     const headers: Record<string, string> = { Accept: accept };
     if (authorization) headers.Authorization = authorization;
-    return fetchFn(url, { headers });
+    // GitHub answers in well under a second. A build should not wait on a
+    // connection that hangs.
+    return fetchFn(url, { headers, signal: AbortSignal.timeout(10_000) });
   };
   let response = await request(token && `Bearer ${token}`);
   // Everything read here is public. An expired or revoked token gets 401,
@@ -62,6 +64,13 @@ function demoteHeadings(html: string): string {
   );
 }
 
+// GitHub marks up mentions and issue links for its own scripts and styles
+// (class="user-mention", data-hovercard-url="..."). None of it means
+// anything on this site.
+function dropGithubAttributes(html: string): string {
+  return html.replace(/\s(?:class|data-[\w-]+)="[^"]*"/g, '');
+}
+
 function toRelease(entry: unknown): Release {
   if (
     !isRecord(entry) ||
@@ -82,7 +91,7 @@ function toRelease(entry: unknown): Release {
     prerelease: entry.prerelease === true,
     html:
       typeof entry.body_html === 'string'
-        ? demoteHeadings(entry.body_html)
+        ? dropGithubAttributes(demoteHeadings(entry.body_html))
         : '',
   };
 }

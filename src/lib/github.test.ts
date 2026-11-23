@@ -183,3 +183,31 @@ test('a 401 without a token is not sent again', async () => {
   assert.equal(await fetchStarCount(fetchFn), null);
   assert.equal(calls.length, 1);
 });
+
+test('fetchReleases drops the class and data attributes GitHub puts in the notes', async () => {
+  const { fetchFn } = fakeFetch([
+    {
+      ...apiReleases[1],
+      body_html:
+        '<p>by <a class="user-mention notranslate" data-hovercard-type="user" data-octo-dimensions="link_type:self" href="https://github.com/octocat">@octocat</a></p>',
+    },
+  ]);
+  assert.equal(
+    (await fetchReleases(fetchFn))?.[0]?.html,
+    '<p>by <a href="https://github.com/octocat">@octocat</a></p>',
+  );
+});
+
+test('every request carries a time limit', async () => {
+  const signals: unknown[] = [];
+  const fetchFn: FetchLike = (_url, init) => {
+    signals.push(init.signal);
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ stargazers_count: 1 }),
+    });
+  };
+  await fetchStarCount(fetchFn);
+  assert.ok(signals[0] instanceof AbortSignal);
+});
