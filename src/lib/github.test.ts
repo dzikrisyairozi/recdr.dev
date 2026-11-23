@@ -151,3 +151,35 @@ test('fetchReleases moves the headings of the notes under the release heading', 
     '<h4>Already low</h4>',
   );
 });
+
+test('a request that a token gets 401 for is sent again without the token', async () => {
+  // An expired token must not hide data that is public anyway.
+  const calls: Call[] = [];
+  const fetchFn: FetchLike = (url, init) => {
+    calls.push({ url, headers: init.headers });
+    const ok = !('Authorization' in init.headers);
+    return Promise.resolve({
+      ok,
+      status: ok ? 200 : 401,
+      json: () => Promise.resolve({ stargazers_count: 7 }),
+    });
+  };
+  assert.equal(await fetchStarCount(fetchFn, 'expired'), 7);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0]?.headers.Authorization, 'Bearer expired');
+  assert.equal(calls[1]?.headers.Authorization, undefined);
+});
+
+test('a 401 without a token is not sent again', async () => {
+  const calls: Call[] = [];
+  const fetchFn: FetchLike = (url, init) => {
+    calls.push({ url, headers: init.headers });
+    return Promise.resolve({
+      ok: false,
+      status: 401,
+      json: () => Promise.resolve({}),
+    });
+  };
+  assert.equal(await fetchStarCount(fetchFn), null);
+  assert.equal(calls.length, 1);
+});

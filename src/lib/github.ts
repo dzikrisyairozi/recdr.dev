@@ -25,9 +25,15 @@ async function getJson(
   accept: string,
   token?: string,
 ): Promise<unknown> {
-  const headers: Record<string, string> = { Accept: accept };
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetchFn(url, { headers });
+  const request = (authorization?: string) => {
+    const headers: Record<string, string> = { Accept: accept };
+    if (authorization) headers.Authorization = authorization;
+    return fetchFn(url, { headers });
+  };
+  let response = await request(token && `Bearer ${token}`);
+  // Everything read here is public. An expired or revoked token gets 401,
+  // and the same request without it still answers.
+  if (response.status === 401 && token) response = await request();
   if (!response.ok) throw new Error(`${url} answered ${response.status}`);
   return response.json();
 }
