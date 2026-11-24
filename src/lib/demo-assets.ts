@@ -17,12 +17,6 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true },
 );
 
-const frames = buildFrames(manifest, diff).map((frame) => {
-  const image = images[`../assets/demo/${frame.file}`]?.default;
-  if (!image) throw new Error(`src/assets/demo/${frame.file} is missing`);
-  return { ...frame, image };
-});
-
 const firstClick = clickPoint(manifest);
 if (!firstClick) throw new Error('the recording has no click');
 const click = firstClick;
@@ -38,14 +32,16 @@ const largestChange = Math.max(
   ...diff.frames.map((frame) => frame.changed_fraction),
 );
 
-/** Every frame with what the hero's timeline and the #frames inspector show for it. */
+/** Every frame with its image and what the demo and the #frames inspector show for it. */
 const strip = await Promise.all(
-  frames.map(async (frame, i) => {
+  buildFrames(manifest, diff).map(async (frame, i) => {
+    const image = images[`../assets/demo/${frame.file}`]?.default;
+    if (!image) throw new Error(`src/assets/demo/${frame.file} is missing`);
     const change = diff.frames[i]!;
     return {
       ...frame,
-      full: (await getImage({ src: frame.image, width: 960, format: 'webp' }))
-        .src,
+      image,
+      full: (await getImage({ src: image, width: 960, format: 'webp' })).src,
       // The changed area as CSS for the box over the frame; empty when nothing changed.
       boxAttr: frame.box
         ? `left:${frame.box.x}%;top:${frame.box.y}%;width:${frame.box.width}%;height:${frame.box.height}%`
@@ -70,7 +66,6 @@ export {
   click,
   contactSheet,
   diff,
-  frames,
   gif,
   manifest,
   mark,

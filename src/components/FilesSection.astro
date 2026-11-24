@@ -3,11 +3,11 @@ import { Image, getImage } from 'astro:assets';
 import {
   contactSheet,
   diff,
-  frames,
   gif,
   manifest,
   mp4Url,
   result,
+  strip,
 } from '../lib/demo-assets.ts';
 
 // The two logs list every frame. Two entries show their shape.
@@ -18,9 +18,9 @@ const manifestText = json({
   frames: manifest.frames.slice(0, shown),
 });
 const diffText = json({ ...diff, frames: diff.frames.slice(0, shown) });
-const cutNote = `${shown} of ${frames.length} frames shown`;
+const cutNote = `${shown} of ${strip.length} frames shown`;
 
-const firstFrame = frames[0]!;
+const firstFrame = strip[0]!;
 // A still of the first frame: the video's poster, and what stands in for
 // the GIF under reduced motion.
 const still = await getImage({

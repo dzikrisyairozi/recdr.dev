@@ -1,8 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import { contactSheet, frames, manifest } from '../lib/demo-assets.ts';
+import { contactSheet, manifest, strip } from '../lib/demo-assets.ts';
 
-const lastFrame = frames.at(-1)!;
+const lastFrame = strip.at(-1)!;
 const seconds = Math.round(manifest.duration_ms / 1000);
 // The pinned scene sizes both figures from the window's height. It needs
 // the width-to-height ratio of the taller one.
