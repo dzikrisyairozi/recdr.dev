@@ -9,11 +9,9 @@ import { headline } from '../lib/landing.ts';
     <div class="copy">
       <h1>{headline}</h1>
       <p class="lede">
-        recdr records a window, a screen region, a monitor or a Chrome tab. It
-        leaves a GIF or MP4 for you, and for your agent a contact sheet of the
-        moments the screen changed, a per-frame change log and the frames as
-        PNG. Agents drive it through a CLI that prints JSON, or through an MCP
-        server.
+        recdr records a window, a region, a monitor or a Chrome tab. You get a
+        GIF or MP4. <strong>Your agent gets the frames that changed</strong>,
+        plus a contact sheet and a change log, over a CLI or MCP.
       </p>
       <InstallCommand idPrefix="hero" />
       <p class="platforms">
@@ -63,6 +61,11 @@ import { headline } from '../lib/landing.ts';
     margin: 0 0 var(--space-8);
     color: var(--text-muted);
     font-size: var(--text-lg);
+  }
+
+  .lede strong {
+    color: var(--text);
+    font-weight: 500;
   }
 
   .platforms {
