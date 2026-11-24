@@ -70,7 +70,9 @@ export function initHeroDemo(): void {
   let last = 0;
   let drawn = '';
   let paused = false;
+  let live = false;
   let inView = false;
+  let frameId = 0;
   // The pointer or the focus is on the timeline: the visitor's frame stays.
   let hovering = false;
   let focused = false;
@@ -79,7 +81,7 @@ export function initHeroDemo(): void {
     const delta = now - last;
     last = now;
     if (!hovering && !focused) {
-      if (!paused && inView && !document.hidden) {
+      if (!paused && !document.hidden) {
         // A tab that was in the background reports one very long frame.
         t = (t + Math.min(delta, 100)) % loopMs(timing);
       }
@@ -94,14 +96,34 @@ export function initHeroDemo(): void {
     } else {
       drawn = '';
     }
-    requestAnimationFrame(tick);
+    // Off screen the loop stops; the observer starts it again.
+    frameId = inView ? requestAnimationFrame(tick) : 0;
+  };
+  const run = () => {
+    if (frameId || !live) return;
+    last = performance.now();
+    frameId = requestAnimationFrame(tick);
   };
 
   new IntersectionObserver(([entry]) => {
     inView = entry?.isIntersecting ?? true;
+    if (inView) run();
   }).observe(root);
 
-  strip.addEventListener('pointerenter', () => (hovering = true));
+  // The pointer or the focus reached the timeline: the whole session shows
+  // around the frame that is in the window, as it does for a picked frame.
+  const inspect = () =>
+    apply(
+      endScene(
+        timing,
+        tiles.findIndex((tile) => tile.getAttribute('aria-pressed') === 'true'),
+      ),
+    );
+
+  strip.addEventListener('pointerenter', () => {
+    hovering = true;
+    inspect();
+  });
   strip.addEventListener('pointerleave', (event) => {
     if (event.pointerType === 'mouse') hovering = false;
   });
@@ -110,7 +132,11 @@ export function initHeroDemo(): void {
   document.addEventListener('pointerdown', (event) => {
     if (!strip.contains(event.target as Node)) hovering = false;
   });
-  strip.addEventListener('focusin', () => (focused = true));
+  strip.addEventListener('focusin', (event) => {
+    // A mouse click focuses the tile too. Only keyboard focus holds the loop.
+    focused = (event.target as Element).matches(':focus-visible');
+    if (focused) inspect();
+  });
   strip.addEventListener('focusout', () => (focused = false));
 
   pauseButton.addEventListener('click', () => {
@@ -150,8 +176,8 @@ export function initHeroDemo(): void {
     );
     pauseButton.hidden = false;
     root.setAttribute('data-live', '');
-    last = performance.now();
-    requestAnimationFrame(tick);
+    live = true;
+    run();
   };
   // The pinned scenes further down set themselves up on the load event too,
   // and that is heavy work. The demo starts when the page has gone quiet.

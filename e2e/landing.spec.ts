@@ -57,6 +57,26 @@ test.describe('the hero demo', () => {
     await expect(timecode).not.toHaveText(stopped!, { timeout: 20_000 });
   });
 
+  test('the pointer on the timeline shows the whole session', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'a phone has no pointer that rests on the timeline');
+    const demo = page.locator('[data-hero-demo]');
+    await expect(page.locator('[data-hero-demo][data-live]')).toBeAttached({
+      timeout: 15_000,
+    });
+    // Before the recording starts the timeline has no tile yet.
+    await demo.locator('[data-scrub-strip]').hover();
+    await expect(demo.locator('.finding')).toBeVisible();
+    await expect(
+      demo.locator('[data-scrub-strip] button').last(),
+    ).toBeVisible();
+
+    await page.mouse.move(0, 0);
+    await expect(demo.locator('.finding')).toBeHidden({ timeout: 20_000 });
+  });
+
   test('a tile picked with the keyboard shows its frame until focus leaves', async ({
     page,
   }) => {
@@ -139,12 +159,14 @@ test('the pinned inspector fits a 1440 by 900 window', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await expect(page.locator('#frames .pin-spacer')).toBeAttached();
-  const bottom = await page.evaluate(() => {
+  await page.evaluate(() => {
     const top = document.querySelector('#frames')!.getBoundingClientRect().top;
     window.scrollTo(0, top + window.scrollY + window.innerHeight * 0.3);
-    return document.querySelector('#frames [data-pin]')!.getBoundingClientRect()
-      .bottom;
   });
+  // ScrollTrigger pins after the scroll event, not in the same task.
+  const pin = page.locator('#frames [data-pin]');
+  await expect(pin).toHaveCSS('position', 'fixed');
+  const bottom = await pin.evaluate((el) => el.getBoundingClientRect().bottom);
   expect(bottom).toBeLessThanOrEqual(900);
 });
 
