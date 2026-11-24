@@ -25,8 +25,9 @@ const frames = buildFrames(manifest, diff).map((frame) => {
 
 const keyframes = frames.filter((frame) => frame.keyframe).slice(0, 12);
 
-const click = clickPoint(manifest);
-if (!click) throw new Error('the recording has no click');
+const firstClick = clickPoint(manifest);
+if (!firstClick) throw new Error('the recording has no click');
+const click = firstClick;
 
 // What an agent does to make this recording, and what it finds in it.
 // session() throws when the recording has no mark.

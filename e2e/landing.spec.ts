@@ -20,14 +20,26 @@ test('the hero has the headline, the install block and the demo', async ({
   await expect(hero.locator('[data-hero-demo]')).toBeVisible();
 });
 
-test('the hero demo runs its timecode', async ({ page }) => {
+test('selecting a hero tile shows that frame', async ({ page }) => {
   await page.goto('/');
-  // On a phone the demo starts below the fold, where it is paused.
-  await page.locator('[data-hero-demo]').scrollIntoViewIfNeeded();
-  // The recording part of the loop starts 1.5 s in.
-  await expect(page.locator('[data-demo-timecode]')).not.toHaveText('00:00.0', {
-    timeout: 6000,
-  });
+  const demo = page.locator('[data-hero-demo]');
+  await demo.scrollIntoViewIfNeeded();
+  const pressed = demo.locator(
+    '[data-scrub-strip] button[aria-pressed="true"]',
+  );
+  const before = await pressed.getAttribute('data-label');
+  await pressed.focus();
+  await page.keyboard.press('ArrowRight');
+
+  await expect(pressed).toBeFocused();
+  await expect(pressed).not.toHaveAttribute('data-label', before!);
+  await expect(demo.locator('[data-scrub-image]')).toHaveAttribute(
+    'src',
+    (await pressed.getAttribute('data-full'))!,
+  );
+  await expect(demo.locator('[data-demo-timecode]')).toHaveText(
+    (await pressed.getAttribute('data-timecode'))!,
+  );
 });
 
 test('the right arrow key moves the scrubber to the next frame', async ({

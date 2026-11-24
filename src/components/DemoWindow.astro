@@ -1,0 +1,77 @@
+---
+// A window frame for the demos: a title bar with room for tools on the
+// right, and the content under it.
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="window">
+  <div class="bar">
+    <span class="dots" aria-hidden="true">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+    <span class="title">{title}</span>
+    <span class="tools">
+      <slot name="tools" />
+    </span>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .window {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.04) inset,
+      0 24px 48px -12px rgb(0 0 0 / 0.6);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 2.5rem;
+    padding: var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .dots {
+    display: flex;
+    flex: none;
+    gap: 6px;
+  }
+
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tools {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-3);
+  }
+</style>

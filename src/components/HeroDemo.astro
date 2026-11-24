@@ -1,52 +1,113 @@
 ---
 import { Image } from 'astro:assets';
-import { click, frames, keyframes } from '../lib/demo-assets.ts';
+import DemoWindow from './DemoWindow.astro';
+import {
+  banner,
+  click,
+  manifest,
+  mark,
+  markIndex,
+  steps,
+  story,
+  strip,
+  timing,
+} from '../lib/demo-assets.ts';
 
-const command = 'recdr record --cdp 9222 --tab checkout --duration 6s';
-const firstFrame = frames[0]!;
+// The HTML is the state the loop ends in: every line of the session, every
+// frame on the timeline, and the frame with the Payment failed banner in the
+// window. That is what shows without JavaScript and with reduced motion.
+const shown = strip[banner.shown]!;
 ---
 
-<div
-  class="demo"
-  data-hero-demo
-  role="img"
-  aria-label="Animation: a terminal runs recdr record, a checkout page is recorded, and its frames fill a grid."
->
-  <div class="terminal">
-    <div class="line">
-      <span class="prompt">$</span>
-      <span class="typed" style={`--chars: ${command.length}`}>
-        {command}
-      </span>
+<figure class="demo" data-hero-demo data-timing={JSON.stringify(timing)}>
+  <div class="scene" data-demo-scene>
+    <div class="agent">
+      <DemoWindow title="agent">
+        <ol>
+          {steps.map((step) =>
+            step.kind === 'tool' ? (
+              <li data-line class="tool">
+                <code>{step.name}</code>
+                <span class="args">{`(${step.args})`}</span>
+                {step.result && (
+                  <span class="result">{`→ ${step.result}`}</span>
+                )}
+              </li>
+            ) : (
+              <li data-line class={step.kind}>
+                {step.text}
+              </li>
+            ),
+          )}
+        </ol>
+      </DemoWindow>
     </div>
-    <div class="clock" data-demo-clock>
-      <span class="dot"></span>
-      <span>REC</span>
-      <span data-demo-timecode>00:00.0</span>
-    </div>
-  </div>
-  <div class="page">
-    <Image
-      src={firstFrame.image}
-      width={480}
-      widths={[480, 960]}
-      sizes="(min-width: 64rem) 32rem, 100vw"
-      alt=""
-      loading="eager"
-    />
-    {click && (
-      <span class="ring" style={`left: ${click.x}%; top: ${click.y}%`} />
-    )}
-  </div>
-  <div class="tiles">
-    {keyframes.map((frame, i) => (
-      <div class="tile" style={`--i: ${i}`}>
-        <Image src={frame.image} width={240} alt="" loading="eager" />
-        <span>{frame.timecode}</span>
+    <div class="browser">
+      <DemoWindow title={story.title}>
+        <Fragment slot="tools">
+          <span class="badge" data-demo-badge>
+            REC
+          </span>
+          <span class="timecode" data-demo-timecode>
+            {shown.timecode}
+          </span>
+          <button
+            type="button"
+            class="pause"
+            data-demo-pause
+            hidden
+            aria-pressed="false"
+            aria-label="Pause the demo"
+          ></button>
+        </Fragment>
+        <div class="stage">
+          <img
+            data-scrub-image
+            src={shown.full}
+            width={manifest.width}
+            height={manifest.height}
+            alt="The recorded checkout page at the selected frame"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <div
+            data-scrub-box
+            hidden={!shown.boxAttr}
+            style={shown.boxAttr || undefined}
+          ></div>
+          <span
+            class="ring"
+            style={`left: ${click.x}%; top: ${click.y}%`}
+          ></span>
+        </div>
+      </DemoWindow>
+      <div class="strip" data-scrub-strip>
+        {strip.map((frame, i) => (
+          <button
+            type="button"
+            aria-label={`Frame ${frame.label} at ${frame.timecode}`}
+            aria-pressed={i === banner.shown ? 'true' : 'false'}
+            tabindex={i === banner.shown ? 0 : -1}
+            data-full={frame.full}
+            data-label={frame.label}
+            data-timecode={frame.timecode}
+            data-changed={frame.changed}
+            data-box={frame.boxAttr}
+            data-keyframe={frame.keyframe ? '' : undefined}
+          >
+            <Image src={frame.image} width={160} alt="" loading="eager" />
+            <span class="time">{frame.timecode}</span>
+            {i === markIndex && <span class="mark">{mark.label}</span>}
+          </button>
+        ))}
       </div>
-    ))}
+    </div>
   </div>
-</div>
+  <figcaption>
+    Illustration of an MCP session. The frames are real recdr output.
+  </figcaption>
+</figure>
 
 <script>
   import { initHeroDemo } from '../scripts/hero-demo.ts';
@@ -56,86 +117,202 @@ const firstFrame = frames[0]!;
 
 <style>
   /*
-    One 8 s loop. Every animation has the same duration, so they stay in step:
-      0 to 1.5 s    the command is typed          (0% to 18.75%)
-      1.5 to 6.5 s  the REC line shows            (18.75% to 81.25%)
-      3.0 to 3.4 s  the click ring                (37.5% to 42.5%)
-      6.5 to 7.5 s  the keyframe tiles come in    (from 81.25%)
-    Without an animation each element is in the state the loop ends in.
+    hero-demo.ts plays the session in a loop and sets these on the figure:
+      data-live       it is playing: lines and tiles without data-shown hide
+      data-recording  the REC badge and the glow are on
+      data-ring       the ring at the click runs once
+    Without them the figure is in the state the loop ends in.
   */
   .demo {
-    display: grid;
-    gap: var(--space-3);
-    /* minmax(0, ...) lets the one-line command shrink with the card */
-    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
-    padding: var(--space-3);
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + var(--space-3));
-    background: var(--surface);
+    margin: 0;
   }
 
-  .demo :global(*) {
-    animation-duration: 8s;
-    animation-iteration-count: infinite;
+  .scene {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
   }
 
-  .demo[data-paused] :global(*) {
-    animation-play-state: paused;
+  /* On a phone the page that is recorded comes first, the log under it. */
+  .agent {
+    order: 1;
+    min-width: 0;
   }
 
-  .demo :global(img) {
-    display: block;
-    width: 100%;
+  .agent :global(.window) {
+    height: 100%;
   }
 
-  .terminal {
-    padding: var(--space-3);
-    border-radius: var(--radius);
-    background: var(--bg);
+  ol {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-4);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    list-style: none;
+  }
+
+  .tool {
     font-family: var(--font-mono);
-    /* the prompt and the 52 characters of the command share one line on a phone */
-    font-size: clamp(0.5rem, 2.3vw, 0.8125rem);
-    line-height: 1.9;
+    overflow-wrap: anywhere;
   }
 
-  .line {
-    display: flex;
-    gap: 1ch;
+  .tool code {
+    color: var(--text);
   }
 
-  .prompt {
+  .tool code::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: var(--space-2);
+    border-radius: 50%;
+    background: var(--text-muted);
+    vertical-align: middle;
+  }
+
+  .args,
+  .result,
+  .action {
     color: var(--text-muted);
   }
 
-  .typed {
-    overflow: hidden;
-    width: calc(var(--chars) * 1ch);
-    white-space: nowrap;
-    animation-name: type;
+  /* The arguments and the results need the width of the desktop panel. */
+  .args,
+  .result {
+    display: none;
   }
 
-  .clock {
+  .finding {
+    padding: var(--space-3) var(--space-4);
+    border-left: 2px solid var(--rec);
+    border-radius: 0 8px 8px 0;
+    background: var(--surface-2);
+    font-size: var(--text-sm);
+  }
+
+  .demo[data-live] [data-line] {
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
+  }
+
+  .demo[data-live] [data-line]:not([data-shown]) {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(0.25rem);
+    transition: none;
+  }
+
+  .browser {
+    position: relative;
+    min-width: 0;
+    isolation: isolate;
+  }
+
+  /* The glow while recording. A shadow, so it cannot make the page scroll sideways. */
+  .browser::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 4rem;
+    z-index: -1;
+    border-radius: var(--radius);
+    box-shadow: 0 0 7rem 0.5rem rgb(229 72 77 / 0.3);
+    opacity: 0;
+    transition: opacity 600ms;
+    pointer-events: none;
+  }
+
+  .demo[data-recording] .browser::before {
+    opacity: 1;
+  }
+
+  .badge {
     display: flex;
     align-items: center;
-    gap: 1ch;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-    opacity: 0;
-    animation-name: clock;
+    gap: var(--space-2);
+    visibility: hidden;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
   }
 
-  .dot {
-    width: 0.6em;
-    height: 0.6em;
+  .badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--rec);
   }
 
-  .page {
+  .demo[data-recording] .badge {
+    visibility: visible;
+  }
+
+  .demo[data-recording] .badge::before {
+    animation: blink 1s steps(2, jump-none) infinite;
+  }
+
+  .timecode {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pause {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .pause[hidden] {
+    display: none;
+  }
+
+  /* Two bars while it plays, a triangle while it is paused. */
+  .pause::before {
+    content: '';
+    width: 3px;
+    height: 10px;
+    border-inline: 3px solid currentColor;
+  }
+
+  .pause[aria-pressed='true']::before {
+    width: 0;
+    height: 0;
+    border-width: 5px 0 5px 9px;
+    border-style: solid;
+    border-color: transparent transparent transparent currentColor;
+  }
+
+  .stage {
     position: relative;
     overflow: hidden;
-    border-radius: var(--radius);
+  }
+
+  .stage img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  [data-scrub-box] {
+    position: absolute;
+    border: 2px solid var(--rec);
+    border-radius: 4px;
+    pointer-events: none;
   }
 
   .ring {
@@ -146,104 +323,150 @@ const firstFrame = frames[0]!;
     border: 2px solid var(--rec);
     border-radius: 50%;
     opacity: 0;
-    animation-name: ring;
+    pointer-events: none;
   }
 
-  .tiles {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+  .demo[data-ring] .ring {
+    animation: ring 400ms ease-out;
+  }
+
+  /* position: the script reads a tile's offset from the strip. */
+  .strip {
+    position: relative;
+    display: flex;
     gap: var(--space-2);
+    overflow-x: auto;
+    /* room above for the mark's label */
+    padding: var(--space-4) var(--space-1) var(--space-2);
+    scrollbar-color: var(--border) transparent;
+    scrollbar-width: thin;
   }
 
-  .tile {
-    animation-name: tile;
-    animation-delay: calc(var(--i) * 80ms);
-    /* keeps the tile hidden while its delay runs on the first loop */
-    animation-fill-mode: backwards;
-  }
-
-  .tile :global(img) {
-    border-radius: 6px;
-  }
-
-  .tile span {
-    display: block;
-    margin-top: var(--space-1);
+  .strip button {
+    position: relative;
+    flex: none;
+    width: 6rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
     color: var(--text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .strip button[aria-pressed='true'] {
+    border-color: var(--rec);
+    color: var(--text);
+  }
+
+  .demo[data-live] .strip button:not([data-shown]) {
+    display: none;
+  }
+
+  .strip :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 7px 7px 0 0;
+  }
+
+  .time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    padding-block: 2px;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     font-variant-numeric: tabular-nums;
   }
 
-  @keyframes type {
-    0% {
-      width: 0;
-      animation-timing-function: steps(52, end);
-    }
-
-    18.75%,
-    100% {
-      width: calc(var(--chars) * 1ch);
-    }
+  .strip button[data-keyframe] .time::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--rec);
   }
 
-  @keyframes clock {
-    0%,
-    18.74% {
-      opacity: 0;
-    }
+  /* The label of `recdr mark`, on the first frame after it. */
+  .mark {
+    position: absolute;
+    top: -0.625rem;
+    left: 0.25rem;
+    padding: 0 0.375rem;
+    border: 1px solid var(--rec);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
 
-    18.75%,
-    81.25% {
+  figcaption {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  @keyframes blink {
+    from {
       opacity: 1;
     }
 
-    83%,
-    100% {
-      opacity: 0;
+    to {
+      opacity: 0.25;
     }
   }
 
   @keyframes ring {
-    0%,
-    37.49% {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-
-    37.5% {
+    from {
       opacity: 1;
       transform: scale(0.3);
     }
 
-    42.5%,
-    100% {
+    to {
       opacity: 0;
       transform: scale(1);
     }
   }
 
-  @keyframes tile {
-    0%,
-    81.25% {
-      opacity: 0;
-      transform: translateY(0.5rem);
+  @media (min-width: 64rem) {
+    .scene {
+      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+      gap: var(--space-6);
     }
 
-    84%,
-    100% {
-      opacity: 1;
-      transform: none;
+    .agent {
+      order: 0;
+    }
+
+    .args {
+      display: inline;
+    }
+
+    .result {
+      display: block;
+    }
+  }
+
+  /* hero-demo.ts sets --rx and --ry from the pointer's place over the demo. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .scene {
+      transform: perspective(1400px) rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg));
+      transition: transform 200ms ease-out;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .demo :global(*) {
+    .demo :global(*),
+    .browser::before {
+      transition: none;
       animation: none;
-    }
-
-    .clock {
-      display: none;
     }
   }
 </style>
