@@ -16,6 +16,7 @@ const timing: Timing = {
   markMs: 1870,
   durationMs: 5000,
   bannerFrame: 3,
+  stepCount: 6,
 };
 
 const rec = (ms: number) => sceneAt(LEAD_MS + ms, timing);
@@ -116,4 +117,5 @@ test('endScene rests on the banner frame, or on the frame it is given', () => {
     ring: false,
   });
   assert.equal(endScene(timing, 1).frame, 1);
+  assert.equal(endScene({ ...timing, stepCount: 7 }).lines, 7);
 });

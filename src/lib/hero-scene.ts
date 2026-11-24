@@ -10,6 +10,8 @@ export type Timing = {
   durationMs: number;
   /** Index of the frame with the whole banner, where the demo rests. */
   bannerFrame: number;
+  /** How many lines the agent's session has. */
+  stepCount: number;
 };
 
 export type Scene = {
@@ -42,7 +44,7 @@ export function endScene(
   frame: number = timing.bannerFrame,
 ): Scene {
   return {
-    lines: 6,
+    lines: timing.stepCount,
     frame,
     tiles: timing.frames.length,
     recording: false,

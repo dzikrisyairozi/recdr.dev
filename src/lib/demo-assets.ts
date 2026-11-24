@@ -62,6 +62,7 @@ const timing: Timing = {
   markMs: mark.t_ms,
   durationMs: manifest.duration_ms,
   bannerFrame: banner.shown,
+  stepCount: steps.length,
 };
 
 export {
