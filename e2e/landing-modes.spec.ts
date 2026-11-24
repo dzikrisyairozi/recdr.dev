@@ -24,6 +24,13 @@ test.describe('with reduced motion', () => {
     );
     expect(animations).toBe(0);
   });
+
+  test('the hero demo shows the end of the session', async ({ page }) => {
+    await page.goto('/');
+    const demo = page.locator('[data-hero-demo]');
+    await expect(demo.locator('.finding')).toBeVisible();
+    await expect(demo.locator('[data-demo-pause]')).toBeHidden();
+  });
 });
 
 test.describe('without JavaScript', () => {
@@ -36,6 +43,10 @@ test.describe('without JavaScript', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Screen recorder your agent can use.',
     );
+
+    const demo = page.locator('[data-hero-demo]');
+    await expect(demo.locator('.finding')).toBeVisible();
+    await expect(demo.locator('[data-scrub-image]')).toBeVisible();
 
     const install = page.locator('[data-install]').first();
     for (const command of installCommands) {

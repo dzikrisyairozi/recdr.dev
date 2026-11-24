@@ -60,7 +60,10 @@ const shown = strip[banner.shown]!;
             aria-label="Pause the demo"
           ></button>
         </Fragment>
-        <div class="stage">
+        <div
+          class="stage"
+          style={`aspect-ratio: ${manifest.width} / ${manifest.height}`}
+        >
           <img
             data-scrub-image
             src={shown.full}
@@ -257,7 +260,16 @@ const shown = strip[banner.shown]!;
     animation: blink 1s steps(2, jump-none) infinite;
   }
 
+  .demo[data-paused] .badge::before {
+    animation-play-state: paused;
+  }
+
+  /* A fixed box, so a new time is not a new layout of the title bar. */
   .timecode {
+    width: 7ch;
+    height: 1.5em;
+    line-height: 1.5;
+    contain: strict;
     color: var(--text-muted);
     font-family: var(--font-mono);
     font-size: 0.75rem;
@@ -297,15 +309,20 @@ const shown = strip[banner.shown]!;
     border-color: transparent transparent transparent currentColor;
   }
 
+  /* The frame changes many times a second while the demo plays. The stage
+     has its size from aspect-ratio and is contained, so a new frame is a
+     repaint of this box and no layout of the page. */
   .stage {
     position: relative;
     overflow: hidden;
+    contain: strict;
   }
 
   .stage img {
-    display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 
   [data-scrub-box] {
@@ -360,8 +377,9 @@ const shown = strip[banner.shown]!;
     color: var(--text);
   }
 
+  /* Hidden, not removed: the timeline keeps its width while it fills. */
   .demo[data-live] .strip button:not([data-shown]) {
-    display: none;
+    visibility: hidden;
   }
 
   .strip :global(img) {

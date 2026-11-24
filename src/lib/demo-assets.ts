@@ -23,8 +23,6 @@ const frames = buildFrames(manifest, diff).map((frame) => {
   return { ...frame, image };
 });
 
-const keyframes = frames.filter((frame) => frame.keyframe).slice(0, 12);
-
 const firstClick = clickPoint(manifest);
 if (!firstClick) throw new Error('the recording has no click');
 const click = firstClick;
@@ -73,7 +71,6 @@ export {
   diff,
   frames,
   gif,
-  keyframes,
   manifest,
   mark,
   markIndex,

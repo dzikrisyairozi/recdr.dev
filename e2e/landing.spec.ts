@@ -20,25 +20,79 @@ test('the hero has the headline, the install block and the demo', async ({
   await expect(hero.locator('[data-hero-demo]')).toBeVisible();
 });
 
-test('selecting a hero tile shows that frame', async ({ page }) => {
-  await page.goto('/');
-  const demo = page.locator('[data-hero-demo]');
-  await demo.scrollIntoViewIfNeeded();
-  const pressed = demo.locator(
-    '[data-scrub-strip] button[aria-pressed="true"]',
-  );
-  const before = await pressed.getAttribute('data-label');
-  await pressed.focus();
-  await page.keyboard.press('ArrowRight');
+// The hero demo loops: 2.4 s before the recording, the recording, 5.1 s
+// after it. On a phone it starts below the fold, where it stands still, so
+// these tests scroll to it first. Their waits add up to more than 30 s.
+test.describe('the hero demo', () => {
+  test.beforeEach(async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/');
+    await page.locator('[data-hero-demo]').scrollIntoViewIfNeeded();
+  });
 
-  await expect(pressed).toBeFocused();
-  await expect(pressed).not.toHaveAttribute('data-label', before!);
-  await expect(demo.locator('[data-scrub-image]')).toHaveAttribute(
-    'src',
-    (await pressed.getAttribute('data-full'))!,
-  );
-  await expect(demo.locator('[data-demo-timecode]')).toHaveText(
-    (await pressed.getAttribute('data-timecode'))!,
+  test('it plays', async ({ page }) => {
+    await expect(page.locator('[data-hero-demo][data-live]')).toBeAttached({
+      timeout: 15_000,
+    });
+    const timecode = page.locator('[data-demo-timecode]');
+    const before = await timecode.textContent();
+    await expect(timecode).not.toHaveText(before!, { timeout: 20_000 });
+  });
+
+  test('the pause button stops it and starts it again', async ({ page }) => {
+    // While it records, the timecode changes ten times a second.
+    await expect(page.locator('[data-hero-demo][data-recording]')).toBeAttached(
+      { timeout: 20_000 },
+    );
+    const pause = page.locator('[data-demo-pause]');
+    const timecode = page.locator('[data-demo-timecode]');
+    await pause.click();
+    await expect(pause).toHaveAttribute('aria-pressed', 'true');
+    const stopped = await timecode.textContent();
+    await page.waitForTimeout(500);
+    await expect(timecode).toHaveText(stopped!);
+
+    await pause.click();
+    await expect(pause).toHaveAttribute('aria-pressed', 'false');
+    await expect(timecode).not.toHaveText(stopped!, { timeout: 20_000 });
+  });
+
+  test('a tile picked with the keyboard shows its frame until focus leaves', async ({
+    page,
+  }) => {
+    const demo = page.locator('[data-hero-demo]');
+    // The timeline has its first tile once the recording has started.
+    await expect(page.locator('[data-hero-demo][data-recording]')).toBeAttached(
+      { timeout: 20_000 },
+    );
+    const tiles = demo.locator('[data-scrub-strip] button');
+    await tiles.first().focus();
+    await page.keyboard.press('ArrowRight');
+
+    const second = tiles.nth(1);
+    await expect(second).toBeFocused();
+    await expect(second).toHaveAttribute('aria-pressed', 'true');
+    await expect(demo.locator('[data-scrub-image]')).toHaveAttribute(
+      'src',
+      (await second.getAttribute('data-full'))!,
+    );
+    const timecode = demo.locator('[data-demo-timecode]');
+    const time = (await second.getAttribute('data-timecode'))!;
+    await expect(timecode).toHaveText(time);
+    await page.waitForTimeout(500);
+    await expect(timecode).toHaveText(time);
+
+    // Not a click somewhere else: that would scroll the page on a phone.
+    await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+    await expect(timecode).not.toHaveText(time, { timeout: 20_000 });
+  });
+});
+
+test('the hero and #agents report the same finding', async ({ page }) => {
+  await page.goto('/');
+  const finding = await page.locator('[data-hero-demo] .finding').textContent();
+  await expect(page.locator('#agents [data-chat] > li').last()).toContainText(
+    finding!.trim(),
   );
 });
 

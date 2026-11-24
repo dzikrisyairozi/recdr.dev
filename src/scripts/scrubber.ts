@@ -20,6 +20,11 @@ export function initScrubber(
 
   const show = (button: HTMLButtonElement) => {
     if (button.getAttribute('aria-pressed') === 'true') return;
+    // Read before anything is written: after a write the browser would have
+    // to lay the page out again to answer.
+    const visible = strip.getBoundingClientRect();
+    const tile = button.getBoundingClientRect();
+
     for (const other of buttons) {
       const selected = other === button;
       other.setAttribute('aria-pressed', String(selected));
@@ -37,8 +42,6 @@ export function initScrubber(
     box.style.cssText = frame.box ?? '';
 
     // Keep the frame inside the strip. scrollIntoView would also scroll the page.
-    const visible = strip.getBoundingClientRect();
-    const tile = button.getBoundingClientRect();
     if (tile.left < visible.left) strip.scrollLeft -= visible.left - tile.left;
     else if (tile.right > visible.right) {
       strip.scrollLeft += tile.right - visible.right;
