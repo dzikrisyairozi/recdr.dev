@@ -100,7 +100,7 @@ test('the right arrow key moves the scrubber to the next frame', async ({
   page,
 }) => {
   await page.goto('/');
-  // The pinned scene brings the strip's buttons in over 60% of a viewport
+  // The pinned scene brings the chart's bars in over 60% of a viewport
   // height of scrolling. Before that they cannot take focus.
   await expect(page.locator('#frames .pin-spacer')).toBeAttached();
   await page.evaluate(() => {
@@ -119,6 +119,33 @@ test('the right arrow key moves the scrubber to the next frame', async ({
   const time = formatTimecode(Math.round(second.t_ms / 100) * 100);
   await expect(readout).toContainText(`frame 000002 · ${time}`);
   await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#frames [data-scrub-json]')).toContainText(
+    `"t_ms": ${second.t_ms}`,
+  );
+});
+
+test('every bar of the frame chart has a name', async ({ page }) => {
+  await page.goto('/');
+  const names = await page
+    .locator('#frames [data-scrub-strip] button')
+    .evaluateAll((bars) => bars.map((bar) => bar.getAttribute('aria-label')));
+  expect(names).toHaveLength(manifest.frames.length);
+  for (const name of names) {
+    expect(name).toMatch(/^Frame \d{6} at \d\d:\d\d\.\d, .+ changed$/);
+  }
+});
+
+test('the pinned inspector fits a 1440 by 900 window', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('#frames .pin-spacer')).toBeAttached();
+  const bottom = await page.evaluate(() => {
+    const top = document.querySelector('#frames')!.getBoundingClientRect().top;
+    window.scrollTo(0, top + window.scrollY + window.innerHeight * 0.3);
+    return document.querySelector('#frames [data-pin]')!.getBoundingClientRect()
+      .bottom;
+  });
+  expect(bottom).toBeLessThanOrEqual(900);
 });
 
 test('the sections follow the hero in order', async ({ page }) => {
