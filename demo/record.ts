@@ -2,6 +2,7 @@
 // src/assets/demo/ and writes demo/story.json. Run from the repository
 // root: node demo/record.ts
 // See demo/RECORDING.md.
+import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { cp, readFile, rm, writeFile } from 'node:fs/promises';
 import { userInfo } from 'node:os';
@@ -11,6 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from '@playwright/test';
 import sharp from 'sharp';
+import { frameLabel } from '../src/lib/frames.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
 // recdr's default output root. Recording there keeps the absolute paths
@@ -40,10 +42,6 @@ async function recdr(...args: string[]): Promise<Record<string, unknown>> {
   return JSON.parse(stdout);
 }
 
-function check(ok: boolean, message: string): void {
-  if (!ok) throw new Error(message);
-}
-
 /** How many pixels of a frame have the banner's red (#dc2626). */
 async function redPixels(file: string): Promise<number> {
   const { data, info } = await sharp(file)
@@ -55,8 +53,6 @@ async function redPixels(file: string): Promise<number> {
   }
   return count;
 }
-
-const label = (file: string) => path.basename(file, '.png');
 
 // channel 'chromium' is the full browser in its new headless mode. The
 // default headless shell sends screencast frames in bursts, not as they change.
@@ -77,7 +73,7 @@ try {
     tabs: { id: string; title: string }[];
   };
   const checkout = tabs.filter((tab) => tab.title.includes('Checkout'));
-  check(
+  assert(
     checkout.length === 1,
     `expected one Checkout tab, found ${checkout.length}`,
   );
@@ -117,7 +113,7 @@ try {
     readFile(path.join(recording, name), 'utf8');
 
   const result = await read('result.json');
-  check(
+  assert(
     !result.toLowerCase().includes(userInfo().username.toLowerCase()),
     'result.json holds a path with your user name; the landing page shows that file',
   );
@@ -134,23 +130,23 @@ try {
   };
   const keyframes = diff.frames.filter((frame) => frame.keyframe).length;
 
-  check(
+  assert(
     manifest.clicks.length === 1,
     `expected one click, found ${manifest.clicks.length}`,
   );
-  check(
+  assert(
     manifest.marks.length === 1,
     `expected one mark, found ${manifest.marks.length}`,
   );
   // The hero downloads every stored frame.
-  check(
+  assert(
     manifest.frames.length <= 60,
     `expected at most 60 stored frames, found ${manifest.frames.length}`,
   );
   // The contact sheet holds 12 keyframes; with more, the banner may be left out.
-  check(keyframes <= 12, `expected at most 12 keyframes, found ${keyframes}`);
+  assert(keyframes <= 12, `expected at most 12 keyframes, found ${keyframes}`);
   // The hero's loop is this duration plus 7.5 s, and has to stay under 16 s.
-  check(
+  assert(
     manifest.duration_ms >= 4500 && manifest.duration_ms <= 8500,
     `expected a recording of 4.5 to 8.5 s, got ${manifest.duration_ms} ms`,
   );
@@ -163,17 +159,17 @@ try {
   // One row of the banner counts as "the banner shows".
   const shows = (count: number) => count >= manifest.width;
   const first = red.findIndex(shows);
-  check(first > 0, 'no stored frame shows the banner');
+  assert(first > 0, 'no stored frame shows the banner');
   const most = Math.max(...red);
   const shown = red.indexOf(most);
   const after = red.findIndex((count, i) => i > shown && !shows(count));
-  check(after > shown, 'the banner is still there in the last frame');
+  assert(after > shown, 'the banner is still there in the last frame');
   // The text and the icon are white, so the whole banner is about 90% red.
-  check(
+  assert(
     most >= manifest.width * bannerHeight * 0.8,
     `no stored frame shows the whole banner; the most red pixels in one frame is ${most}`,
   );
-  check(
+  assert(
     diff.frames.slice(first, after).some((frame) => frame.keyframe),
     'no keyframe shows the banner, so the contact sheet does not either',
   );
@@ -181,9 +177,9 @@ try {
   const story = {
     title: tab.title,
     tab_id: tab.id,
-    banner_first: label(manifest.frames[first]!.file),
-    banner_shown: label(manifest.frames[shown]!.file),
-    banner_after: label(manifest.frames[after]!.file),
+    banner_first: frameLabel(manifest.frames[first]!.file),
+    banner_shown: frameLabel(manifest.frames[shown]!.file),
+    banner_after: frameLabel(manifest.frames[after]!.file),
   };
 
   await rm(assets, { recursive: true, force: true });
