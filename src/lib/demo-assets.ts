@@ -25,7 +25,7 @@ const click = firstClick;
 // session() throws when the recording has no mark.
 const steps = session(manifest, story, result);
 const mark = manifest.marks[0]!;
-const markIndex = markFrame(manifest)!;
+const markIndex = markFrame(manifest, mark);
 const banner = bannerFrames(manifest, story);
 
 const largestChange = Math.max(

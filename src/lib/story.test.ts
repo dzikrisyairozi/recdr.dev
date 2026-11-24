@@ -65,25 +65,18 @@ test('bannerFrames throws when the frames are out of order', () => {
 });
 
 test('markFrame is the first frame at or after the mark', () => {
-  assert.equal(markFrame(manifest), 1);
+  assert.equal(markFrame(manifest, manifest.marks[0]!), 1);
 });
 
 test('markFrame reads frames in file order when their times are not', () => {
   const frames = manifest.frames.map((frame) => ({ ...frame }));
   frames[1]!.t_ms = 2600;
   frames[2]!.t_ms = 1900;
-  assert.equal(markFrame({ ...manifest, frames }), 1);
+  assert.equal(markFrame({ ...manifest, frames }, manifest.marks[0]!), 1);
 });
 
 test('markFrame is the last frame when the mark is later than all of them', () => {
-  assert.equal(
-    markFrame({ ...manifest, marks: [{ t_ms: 9000, label: 'late' }] }),
-    6,
-  );
-});
-
-test('markFrame is null without a mark', () => {
-  assert.equal(markFrame({ ...manifest, marks: [] }), null);
+  assert.equal(markFrame(manifest, { t_ms: 9000 }), 6);
 });
 
 test('seconds rounds to the nearest tenth', () => {

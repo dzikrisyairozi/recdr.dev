@@ -52,9 +52,7 @@ export function bannerFrames(
 }
 
 /** Index of the first frame at or after the mark; the last frame when none is. */
-export function markFrame(manifest: Manifest): number | null {
-  const mark = manifest.marks[0];
-  if (!mark) return null;
+export function markFrame(manifest: Manifest, mark: { t_ms: number }): number {
   const i = manifest.frames.findIndex((frame) => frame.t_ms >= mark.t_ms);
   return i === -1 ? manifest.frames.length - 1 : i;
 }
