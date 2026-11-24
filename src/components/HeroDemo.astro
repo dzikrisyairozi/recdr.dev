@@ -45,9 +45,7 @@ const shown = strip[banner.shown]!;
     <div class="browser">
       <DemoWindow title={story.title}>
         <Fragment slot="tools">
-          <span class="badge" data-demo-badge>
-            REC
-          </span>
+          <span class="badge">REC</span>
           <span class="timecode" data-demo-timecode>
             {shown.timecode}
           </span>
@@ -92,9 +90,7 @@ const shown = strip[banner.shown]!;
             aria-pressed={i === banner.shown ? 'true' : 'false'}
             tabindex={i === banner.shown ? 0 : -1}
             data-full={frame.full}
-            data-label={frame.label}
             data-timecode={frame.timecode}
-            data-changed={frame.changed}
             data-box={frame.boxAttr}
             data-keyframe={frame.keyframe ? '' : undefined}
           >
