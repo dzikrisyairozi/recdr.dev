@@ -1,17 +1,7 @@
 ---
-import { Image, getImage } from 'astro:assets';
-import { frames, manifest } from '../lib/demo-assets.ts';
+import { Image } from 'astro:assets';
+import { manifest, strip } from '../lib/demo-assets.ts';
 
-const strip = await Promise.all(
-  frames.map(async (frame) => ({
-    ...frame,
-    full: (await getImage({ src: frame.image, width: 960, format: 'webp' }))
-      .src,
-    boxAttr: frame.box
-      ? `left:${frame.box.x}%;top:${frame.box.y}%;width:${frame.box.width}%;height:${frame.box.height}%`
-      : '',
-  })),
-);
 const first = strip[0]!;
 ---
 
@@ -64,7 +54,8 @@ const first = strip[0]!;
 <script>
   import { initScrubber } from '../scripts/scrubber.ts';
 
-  initScrubber();
+  const root = document.querySelector<HTMLElement>('#frames');
+  if (root) initScrubber(root);
 </script>
 
 <style>
