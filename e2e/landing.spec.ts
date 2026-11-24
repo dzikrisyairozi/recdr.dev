@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-test('the hero has the headline, the install block and the demo', async ({
+test('the hero has the headline, the install block and the frame stack', async ({
   page,
 }) => {
   await page.goto('/');
@@ -17,12 +17,53 @@ test('the hero has the headline, the install block and the demo', async ({
     'Screen recorder your agent can use.',
   );
   await expect(hero.locator('[data-install]')).toBeVisible();
-  await expect(hero.locator('[data-hero-demo]')).toBeVisible();
+
+  // One plane per stored frame. The stack is decoration: the demo in the
+  // next section is what a screen reader gets.
+  const stack = hero.locator('[data-hero-stack]');
+  await expect(stack).toBeVisible();
+  await expect(stack).toHaveAttribute('aria-hidden', 'true');
+  await expect(stack.locator('img')).toHaveCount(manifest.frames.length);
 });
 
-// The hero demo loops: 2.4 s before the recording, the recording, 5.1 s
-// after it. On a phone it starts below the fold, where it stands still, so
-// these tests scroll to it first. Their waits add up to more than 30 s.
+test('the frame stack loops, and stops while the hero is off screen', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const stack = page.locator('[data-hero-stack]');
+  // Not the animation that follows the scroll position, where there is one.
+  const running = () =>
+    stack.evaluate(
+      (el) =>
+        el
+          .getAnimations({ subtree: true })
+          .filter(
+            (animation) =>
+              animation.timeline === document.timeline &&
+              animation.playState === 'running',
+          ).length,
+    );
+  await expect.poll(running).toBeGreaterThan(0);
+
+  await page.locator('#install').scrollIntoViewIfNeeded();
+  await expect(stack).toHaveAttribute('data-offscreen', '');
+  await expect.poll(running).toBe(0);
+});
+
+test('the demo has a section of its own under the hero', async ({ page }) => {
+  await page.goto('/');
+  const demo = page.locator('section#demo');
+  await expect(demo.getByRole('heading', { level: 2 })).toHaveText(
+    'Watch an agent use it',
+  );
+  await expect(demo.locator('[data-hero-demo]')).toBeVisible();
+  // The hero's stack is the page's first image now.
+  await expect(demo.locator('img[fetchpriority]')).toHaveCount(0);
+});
+
+// The demo loops: 2.4 s before the recording, the recording, 5.1 s after
+// it. It starts below the fold, where it stands still, so these tests
+// scroll to it first. Their waits add up to more than 30 s.
 test.describe('the hero demo', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(60_000);
@@ -177,6 +218,7 @@ test('the sections follow the hero in order', async ({ page }) => {
     .evaluateAll((sections) => sections.map((section) => section.id));
   expect(ids).toEqual([
     'top',
+    'demo',
     'why',
     'how',
     'frames',

@@ -1,0 +1,314 @@
+---
+import { Image } from 'astro:assets';
+import { banner, manifest, strip } from '../lib/demo-assets.ts';
+import { stackPlanes } from '../lib/hero-stack.ts';
+
+// Decoration for the hero: the recording as a pile of frames through time,
+// newest in front, with the frames that show the banner lifted out of it.
+// The demo in the next section is what explains it, so this is hidden from
+// assistive technology.
+const planes = stackPlanes(strip.length, banner);
+---
+
+<div
+  class="stack"
+  data-hero-stack
+  aria-hidden="true"
+  style={`--n: ${planes.length}`}
+>
+  <div class="camera">
+    <div
+      class="deck"
+      style={`aspect-ratio: ${manifest.width} / ${manifest.height}`}
+    >
+      {planes.map((plane) => {
+        const frame = strip[plane.frame]!;
+        return (
+          <div
+            class="plane"
+            style={`--d: ${plane.depth}; --lift: ${plane.lift}`}
+            data-banner={plane.lift > 0 ? '' : undefined}
+          >
+            <Image
+              src={frame.image}
+              width={480}
+              alt=""
+              loading="eager"
+              fetchpriority={plane.depth === 0 ? 'high' : 'low'}
+              decoding="async"
+            />
+            {plane.lift === 1 && (
+              <span class="tag">{`frame ${frame.label} · ${frame.timecode}`}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initHeroStack } from '../scripts/hero-stack.ts';
+
+  initHeroStack();
+</script>
+
+<style>
+  /*
+    Each plane has --d, its depth (0 is the newest frame, in front), and
+    --lift, how far it is lifted out of the stack (0 to 1). The loop is one
+    set of keyframes that reads both, delayed a little more for each step
+    back, so the stack opens plane after plane.
+
+    Without the animation (reduced motion) a plane is where its transform
+    puts it: the open stack, banner frames lifted.
+  */
+  .stack {
+    --plane: min(68vw, 20rem);
+    --gap: 1.125rem;
+    --rise: 4.5rem;
+    --loop: 12s;
+    position: relative;
+    height: 23rem;
+    perspective: 1800px;
+    perspective-origin: 40% 30%;
+    pointer-events: none;
+  }
+
+  /* A red light behind the stack while the banner frames are out of it. */
+  .stack::before {
+    content: '';
+    position: absolute;
+    inset: -10% -30% 10% 0;
+    background: radial-gradient(
+      closest-side,
+      rgb(229 72 77 / 0.22),
+      transparent
+    );
+    animation: stack-glow var(--loop) ease-in-out infinite backwards;
+  }
+
+  .camera,
+  .deck {
+    transform-style: preserve-3d;
+  }
+
+  /* hero-stack.ts sets --rx and --ry from the pointer's place over the hero. */
+  .camera {
+    position: absolute;
+    bottom: 12%;
+    left: 4%;
+    width: var(--plane);
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 400ms ease-out;
+  }
+
+  /* Seen from above and from the right: older frames run up and to the right. */
+  .deck {
+    position: relative;
+    transform: rotateX(-15deg) rotateY(-34deg);
+    animation: stack-sway 16s ease-in-out infinite alternate;
+  }
+
+  .plane {
+    --z: calc(var(--d) * var(--gap) * -1);
+    --y: calc(var(--lift) * var(--rise) * -1);
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    transform: translate3d(0, var(--y), var(--z));
+    animation: stack-open var(--loop) cubic-bezier(0.65, 0, 0.35, 1) infinite
+      backwards;
+    animation-delay: calc(var(--d) * 35ms);
+  }
+
+  .plane :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 9px;
+  }
+
+  /* Older frames fade into the page. An overlay, so the frame is not
+     altered. While the stack is open a light runs through it from the
+     oldest frame to the newest: each overlay clears for a moment. */
+  .plane::after {
+    --fade: calc(var(--d) * 0.04);
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: var(--bg);
+    opacity: var(--fade);
+    animation: stack-playhead var(--loop) linear infinite backwards;
+    animation-delay: calc((var(--n) - var(--d)) * 90ms);
+  }
+
+  .plane[data-banner] {
+    border-color: var(--rec);
+  }
+
+  .plane[data-banner]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 1.5rem rgb(229 72 77 / calc(0.15 + var(--lift) * 0.3));
+    animation: stack-glow var(--loop) ease-in-out infinite backwards;
+    animation-delay: inherit;
+  }
+
+  .tag {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 1;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--rec);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    animation: stack-glow var(--loop) ease-in-out infinite backwards;
+    animation-delay: inherit;
+  }
+
+  /* Closed, the planes keep 3px between them: planes at one depth flicker. */
+  @keyframes stack-open {
+    0%,
+    9% {
+      transform: translate3d(0, 0, calc(var(--d) * -3px));
+    }
+
+    27%,
+    33% {
+      transform: translate3d(0, 0, var(--z));
+    }
+
+    42%,
+    84% {
+      transform: translate3d(0, var(--y), var(--z));
+    }
+
+    90% {
+      transform: translate3d(0, 0, var(--z));
+    }
+
+    100% {
+      transform: translate3d(0, 0, calc(var(--d) * -3px));
+    }
+  }
+
+  @keyframes stack-glow {
+    0%,
+    33%,
+    90%,
+    100% {
+      opacity: 0;
+    }
+
+    44%,
+    82% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes stack-playhead {
+    0%,
+    47% {
+      opacity: var(--fade);
+    }
+
+    49% {
+      opacity: 0;
+    }
+
+    56%,
+    100% {
+      opacity: var(--fade);
+    }
+  }
+
+  @keyframes stack-sway {
+    from {
+      transform: rotateX(-16deg) rotateY(-37deg);
+    }
+
+    to {
+      transform: rotateX(-13deg) rotateY(-30deg);
+    }
+  }
+
+  .stack[data-offscreen]::before,
+  .stack[data-offscreen] :is(.deck, .plane, .tag),
+  .stack[data-offscreen] .plane::before,
+  .stack[data-offscreen] .plane::after {
+    animation-play-state: paused;
+  }
+
+  @media (min-width: 48rem) {
+    .stack {
+      --plane: 24rem;
+      --gap: 1.5rem;
+      --rise: 6rem;
+      height: 31rem;
+    }
+
+    .camera {
+      left: 14%;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .stack {
+      --plane: 30rem;
+      --gap: 2rem;
+      --rise: 8.5rem;
+      height: 100%;
+      min-height: 30rem;
+    }
+
+    .camera {
+      bottom: 16%;
+      left: 0;
+    }
+  }
+
+  /* Where the browser can tie an animation to scrolling, the stack sinks
+     and fades as the hero leaves the window. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .stack {
+        animation: stack-leave linear both;
+        animation-timeline: view();
+        animation-range: exit;
+      }
+    }
+  }
+
+  @keyframes stack-leave {
+    to {
+      opacity: 0;
+      transform: translateY(6rem) scale(0.94);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .camera {
+      transition: none;
+    }
+
+    /* .stack in front, so these outrank .plane[data-banner]::before. */
+    .stack::before,
+    .stack :is(.deck, .plane, .tag),
+    .stack .plane::before,
+    .stack .plane::after {
+      animation: none;
+    }
+  }
+</style>

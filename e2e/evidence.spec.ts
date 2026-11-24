@@ -10,6 +10,7 @@ import { test } from '@playwright/test';
 const out = process.env.EVIDENCE_DIR ?? 'spec/1-recdr-dev-site/evidence';
 const ids = [
   'top',
+  'demo',
   'why',
   'how',
   'frames',

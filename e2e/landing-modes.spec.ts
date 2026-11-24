@@ -4,6 +4,21 @@ import { installCommands } from '../src/lib/install.ts';
 test.describe('with reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
 
+  test('the frame stack stands still, open', async ({ page }) => {
+    await page.goto('/');
+    const stack = page.locator('[data-hero-stack]');
+    const animations = await stack.evaluate(
+      (el) => el.getAnimations({ subtree: true }).length,
+    );
+    expect(animations).toBe(0);
+    // The oldest frame is far behind the newest one.
+    const depth = await stack
+      .locator('.plane')
+      .last()
+      .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m43);
+    expect(depth).toBeLessThan(-100);
+  });
+
   test('nothing is pinned and the hero demo does not animate', async ({
     page,
   }) => {
