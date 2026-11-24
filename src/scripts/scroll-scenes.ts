@@ -76,7 +76,8 @@ export function initScrollScenes(): void {
     const frames = scene('frames', '+=60%');
     frames?.timeline.from(
       frames.section.querySelectorAll('[data-scrub-strip] button'),
-      { yPercent: 40, autoAlpha: 0, stagger: 0.05 },
+      // An amount for the whole chart: a recording can have 60 bars.
+      { yPercent: 40, autoAlpha: 0, stagger: { amount: 1 } },
     );
 
     return () => whySection?.removeAttribute('data-scene-active');

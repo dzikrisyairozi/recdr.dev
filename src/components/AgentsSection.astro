@@ -1,15 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { contactSheet } from '../lib/demo-assets.ts';
-
-// Read off the labels on contact_sheet.png: the tile where the toast starts
-// to show, and the tile after it has left. Check both after recording again
-// (demo/RECORDING.md).
-const toastArrives = '2.3s';
-const toastGone = '4.3s';
-// One string: Astro drops the space between text and an expression that
-// starts a new line.
-const agentReply = `The toast "Payment accepted" appears at ${toastArrives} and is gone by ${toastGone}.`;
+import { contactSheet, steps } from '../lib/demo-assets.ts';
 ---
 
 <section id="agents" class="section">
@@ -26,34 +17,37 @@ const agentReply = `The toast "Payment accepted" appears at ${toastArrives} and 
             then show me the contact sheet
           </p>
         </li>
-        <li class="tool">
-          <span class="who">Tool call</span>
-          <code>list_tabs</code>
-        </li>
-        <li class="tool">
-          <span class="who">Tool call</span>
-          <code>start_recording</code>
-        </li>
-        <li class="aside">The agent clicks Buy.</li>
-        <li class="tool">
-          <span class="who">Tool call</span>
-          <code>stop_recording</code>
-        </li>
-        <li class="result">
-          <Image
-            src={contactSheet}
-            width={960}
-            alt="The contact sheet of the recording, as the tool returns it."
-            loading="lazy"
-          />
-          <p>
-            <code>stop_recording</code> returns the contact sheet as an image.
-          </p>
-        </li>
-        <li class="message agent">
-          <span class="who">Agent</span>
-          <p>{agentReply}</p>
-        </li>
+        {steps.map((step) => (
+          <>
+            {step.kind === 'tool' && (
+              <li class="tool">
+                <span class="who">Tool call</span>
+                <code>{step.name}</code>
+              </li>
+            )}
+            {step.kind === 'action' && <li class="aside">{step.text}</li>}
+            {step.kind === 'tool' && step.name === 'stop_recording' && (
+              <li class="result">
+                <Image
+                  src={contactSheet}
+                  width={960}
+                  alt="The contact sheet of the recording, as the tool returns it."
+                  loading="lazy"
+                />
+                <p>
+                  <code>stop_recording</code> returns the contact sheet as an
+                  image.
+                </p>
+              </li>
+            )}
+            {step.kind === 'finding' && (
+              <li class="message agent">
+                <span class="who">Agent</span>
+                <p>{step.text}</p>
+              </li>
+            )}
+          </>
+        ))}
       </ol>
       <p class="caption">
         Illustration of an MCP session. The contact sheet is real recdr output.

@@ -1,45 +1,57 @@
 ---
-import HeroDemo from './HeroDemo.astro';
+import HeroStack from './HeroStack.astro';
 import InstallCommand from './InstallCommand.astro';
 import { headline } from '../lib/landing.ts';
 ---
 
 <section id="top" class="hero">
-  <div class="copy">
-    <h1>{headline}</h1>
-    <p class="lede">
-      recdr records a window, a screen region, a monitor or a Chrome tab. It
-      leaves a GIF or MP4 for you, and for your agent a contact sheet of the
-      moments the screen changed, a per-frame change log and the frames as PNG.
-      Agents drive it through a CLI that prints JSON, or through an MCP server.
-    </p>
-    <InstallCommand idPrefix="hero" />
-    <p class="platforms">
-      Windows and macOS for windows, regions and monitors. Windows, macOS and
-      Linux for browser tabs.
-    </p>
+  <div class="inner">
+    <div class="copy">
+      <h1>{headline}</h1>
+      <p class="lede">
+        recdr records a window, a screen region, a monitor or a Chrome tab. It
+        leaves a GIF or MP4 for you, and for your agent a contact sheet of the
+        moments the screen changed, a per-frame change log and the frames as
+        PNG. Agents drive it through a CLI that prints JSON, or through an MCP
+        server.
+      </p>
+      <InstallCommand idPrefix="hero" />
+      <p class="platforms">
+        Windows and macOS for windows, regions and monitors. Windows, macOS and
+        Linux for browser tabs.
+      </p>
+    </div>
+    <HeroStack />
   </div>
-  <HeroDemo />
 </section>
 
 <style>
+  /* The frame stack runs past the right edge of the content. The section
+     is as wide as the window and cuts it off there. */
   .hero {
+    overflow: hidden;
+  }
+
+  .inner {
     display: grid;
-    gap: var(--space-12);
+    gap: var(--space-8);
     max-width: var(--content-width);
     margin-inline: auto;
-    padding: var(--space-12) var(--space-4) var(--space-16);
+    padding: var(--space-12) var(--space-4) var(--space-8);
   }
 
   /* A grid item is at least as wide as its content by default, and the
-     install command is one long line. */
+     install command is one long line. Above the stack, which may reach
+     under the copy. */
   .copy {
+    position: relative;
+    z-index: 1;
     min-width: 0;
   }
 
   h1 {
     margin: 0 0 var(--space-6);
-    font-size: min(var(--text-hero), 5rem);
+    font-size: min(var(--text-hero), 4rem);
     font-weight: 600;
     line-height: 1.02;
     letter-spacing: -0.035em;
@@ -60,11 +72,11 @@ import { headline } from '../lib/landing.ts';
   }
 
   @media (min-width: 64rem) {
-    .hero {
-      grid-template-columns: 1fr 1fr;
+    .inner {
+      grid-template-columns: minmax(0, 40rem) minmax(0, 1fr);
       align-items: center;
-      gap: var(--space-16);
-      padding-block: var(--space-24);
+      min-height: min(calc(100svh - var(--header-height)), 54rem);
+      padding-block: var(--space-16);
     }
   }
 </style>

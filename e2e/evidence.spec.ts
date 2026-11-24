@@ -2,13 +2,15 @@
 //
 //   EVIDENCE=1 pnpm test:e2e --project=chromium e2e/evidence.spec.ts
 //
-// The files go to spec/1-recdr-dev-site/evidence/, which is git-ignored.
+// The files go to spec/1-recdr-dev-site/evidence/, or to the folder in
+// EVIDENCE_DIR. Everything under spec/ is git-ignored.
 import { mkdirSync } from 'node:fs';
 import { test } from '@playwright/test';
 
-const out = 'spec/1-recdr-dev-site/evidence';
+const out = process.env.EVIDENCE_DIR ?? 'spec/1-recdr-dev-site/evidence';
 const ids = [
   'top',
+  'demo',
   'why',
   'how',
   'frames',

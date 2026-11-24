@@ -1,17 +1,7 @@
 ---
-import { Image, getImage } from 'astro:assets';
-import { frames, manifest } from '../lib/demo-assets.ts';
+import DemoWindow from './DemoWindow.astro';
+import { manifest, mark, markIndex, story, strip } from '../lib/demo-assets.ts';
 
-const strip = await Promise.all(
-  frames.map(async (frame) => ({
-    ...frame,
-    full: (await getImage({ src: frame.image, width: 960, format: 'webp' }))
-      .src,
-    boxAttr: frame.box
-      ? `left:${frame.box.x}%;top:${frame.box.y}%;width:${frame.box.width}%;height:${frame.box.height}%`
-      : '',
-  })),
-);
 const first = strip[0]!;
 ---
 
@@ -20,81 +10,102 @@ const first = strip[0]!;
     <h2 class="section-title" data-reveal>
       Every frame that changed
     </h2>
-    <div class="stage">
-      <img
-        data-scrub-image
-        src={first.full}
-        width={manifest.width}
-        height={manifest.height}
-        alt="The recorded checkout page at the selected frame"
-        loading="lazy"
-        decoding="async"
-      />
-      <div data-scrub-box hidden></div>
+    <div class="inspector">
+      <div class="view">
+        <DemoWindow title={story.title}>
+          <div
+            class="stage"
+            style={`aspect-ratio: ${manifest.width} / ${manifest.height}`}
+          >
+            <img
+              data-scrub-image
+              src={first.full}
+              width={manifest.width}
+              height={manifest.height}
+              alt="The recorded checkout page at the selected frame"
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              data-scrub-box
+              hidden={!first.boxAttr}
+              style={first.boxAttr || undefined}
+            ></div>
+          </div>
+        </DemoWindow>
+      </div>
+      <output class="readout" data-scrub-readout>
+        frame {first.label} · {first.timecode} · {first.changed} changed
+      </output>
+      <div class="chart" data-scrub-strip>
+        {strip.map((frame, i) => (
+          <button
+            type="button"
+            aria-label={`Frame ${frame.label} at ${frame.timecode}, ${frame.changed} changed`}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-full={frame.full}
+            data-label={frame.label}
+            data-timecode={frame.timecode}
+            data-changed={frame.changed}
+            data-box={frame.boxAttr}
+            data-json={frame.json}
+            data-keyframe={frame.keyframe ? '' : undefined}
+          >
+            <span class="bar" style={`height: ${frame.bar}%`}></span>
+            {i === markIndex && <span class="mark">{mark.label}</span>}
+          </button>
+        ))}
+      </div>
+      <p class="note">
+        Bar height is the share of pixels that changed, on a square-root scale.
+        A red dot marks a keyframe; the red box on the frame is the area that
+        changed, from <code>diff.json</code>.
+      </p>
+      <pre
+        data-scrub-json
+        tabindex="0"
+        aria-label="The selected frame's entry in diff.json"
+      >{first.json}</pre>
     </div>
-    <output class="readout" data-scrub-readout>
-      frame {first.label} · {first.timecode} · {first.changed} changed
-    </output>
-    <div class="strip" data-scrub-strip>
-      {strip.map((frame, i) => (
-        <button
-          type="button"
-          aria-label={`Frame ${frame.label} at ${frame.timecode}`}
-          aria-pressed={i === 0 ? 'true' : 'false'}
-          tabindex={i === 0 ? 0 : -1}
-          data-full={frame.full}
-          data-label={frame.label}
-          data-timecode={frame.timecode}
-          data-changed={frame.changed}
-          data-box={frame.boxAttr}
-          data-keyframe={frame.keyframe ? '' : undefined}
-        >
-          <Image src={frame.image} width={160} alt="" loading="lazy" />
-          <span>{frame.timecode}</span>
-        </button>
-      ))}
-    </div>
-    <p class="note">
-      The red box is the area that changed, from <code>diff.json</code>. A red
-      dot marks a keyframe; the contact sheet shows up to 12 of them.
-    </p>
   </div>
 </section>
 
 <script>
   import { initScrubber } from '../scripts/scrubber.ts';
 
-  initScrubber();
+  const root = document.querySelector<HTMLElement>('#frames');
+  if (root) initScrubber(root);
 </script>
 
 <style>
-  /* Sized from the viewport height, so the heading, the frame and the strip
+  .inspector {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Sized from the viewport height, so the heading, the frame and the chart
      fit on one screen while the section is pinned. */
-  .stage {
-    position: relative;
-    width: min(100%, calc((100svh - 28rem) * 1.6));
+  .view {
+    width: min(100%, calc((100svh - 30rem) * 1.6));
     min-width: min(100%, 20rem);
     margin-inline: auto;
+  }
+
+  .stage {
+    position: relative;
     overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
   }
 
   .stage img {
     display: block;
     width: 100%;
-  }
-
-  [data-scrub-box] {
-    position: absolute;
-    border: 2px solid var(--rec);
-    border-radius: 4px;
-    pointer-events: none;
+    height: 100%;
   }
 
   .readout {
     display: block;
-    margin-block: var(--space-4);
+    margin-block: var(--space-3);
     color: var(--text-muted);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
@@ -102,55 +113,60 @@ const first = strip[0]!;
     text-align: center;
   }
 
-  .strip {
+  /* One column per frame. The room above is for the mark's label, the room
+     below for the keyframe dots. */
+  .chart {
     display: flex;
-    gap: var(--space-2);
-    overflow-x: auto;
-    padding: var(--space-1) var(--space-1) var(--space-3);
-    scrollbar-color: var(--border) transparent;
-    scrollbar-width: thin;
+    gap: 2px;
+    height: 5rem;
+    margin-block: var(--space-4) var(--space-3);
+    border-bottom: 1px solid var(--border);
   }
 
   button {
-    flex: none;
-    width: 7rem;
+    position: relative;
+    flex: 1;
+    min-width: 0;
     padding: 0;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text-muted);
-    font: inherit;
+    border: 0;
+    border-radius: 3px 3px 0 0;
+    background: none;
     cursor: pointer;
   }
 
   button[aria-pressed='true'] {
-    border-color: var(--rec);
-    color: var(--text);
+    background: var(--surface-2);
   }
 
-  button :global(img) {
-    display: block;
-    width: 100%;
+  .bar {
+    position: absolute;
+    inset: auto 0 0;
+    /* a frame where nothing changed still has a place on the chart */
+    min-height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--text-muted);
   }
 
-  button span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    padding-block: var(--space-1);
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-variant-numeric: tabular-nums;
+  button[aria-pressed='true'] .bar {
+    background: var(--text);
   }
 
-  button[data-keyframe] span::before {
+  button[data-keyframe]::after {
     content: '';
-    width: 6px;
-    height: 6px;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: calc(50% - 2.5px);
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: var(--rec);
+  }
+
+  /* The label of `recdr mark`, over the first frame after it. The rest of
+     it is in global.css. */
+  .mark {
+    bottom: 100%;
+    left: 0;
   }
 
   .note {
@@ -160,9 +176,35 @@ const first = strip[0]!;
     text-align: center;
   }
 
-  @media (min-width: 48rem) {
-    button {
-      width: 10rem;
+  pre {
+    margin: var(--space-4) 0 0;
+    padding: var(--space-4);
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  @media (min-width: 64rem) {
+    .inspector {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      column-gap: var(--space-6);
+    }
+
+    .inspector > * {
+      grid-column: 1;
+    }
+
+    /* .inspector > pre, so it outranks the rule above */
+    .inspector > pre {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      align-self: start;
+      margin: 0;
     }
   }
 </style>

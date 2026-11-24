@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  barHeight,
   buildFrames,
   clickPoint,
   formatChanged,
@@ -11,13 +12,16 @@ import {
 
 // A real two-frame recdr recording, 320 by 240.
 const manifest: Manifest = {
+  id: '20260101-000000-abcd',
   width: 320,
   height: 240,
+  duration_ms: 66,
   frames: [
     { index: 1, t_ms: 0, file: 'frames/000001.png' },
     { index: 2, t_ms: 66, file: 'frames/000002.png' },
   ],
   clicks: [],
+  marks: [],
 };
 
 const diff: Diff = {
@@ -68,13 +72,25 @@ test('buildFrames throws when the two files disagree on the frame count', () => 
   assert.throws(() => buildFrames(manifest, { frames: diff.frames.slice(1) }));
 });
 
-test('clickPoint gives the first click in percent of the frame', () => {
+test('clickPoint gives the first click in percent of the frame, and its time', () => {
   assert.equal(clickPoint(manifest), null);
   assert.deepEqual(
     clickPoint({
       ...manifest,
       clicks: [{ t_ms: 10, x: 160, y: 60, button: 'left' }],
     }),
-    { x: 50, y: 25 },
+    { x: 50, y: 25, t_ms: 10 },
   );
+});
+
+test('barHeight is a percentage of the largest change, on a square-root scale', () => {
+  assert.equal(barHeight(0.08, 0.08), 100);
+  assert.equal(barHeight(0.02, 0.08), 50);
+});
+
+test('barHeight keeps a small change visible and no change flat', () => {
+  assert.equal(barHeight(0.0002, 0.08), 5);
+  assert.equal(barHeight(0.00001, 0.08), 4);
+  assert.equal(barHeight(0, 0.08), 0);
+  assert.equal(barHeight(0, 0), 0);
 });
