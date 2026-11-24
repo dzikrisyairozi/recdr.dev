@@ -14,7 +14,7 @@ The site for [recdr](https://github.com/dzikrisyairozi/recdr): home page, docs, 
 [![CI](https://github.com/dzikrisyairozi/recdr.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/dzikrisyairozi/recdr.dev/actions/workflows/ci.yml)
 [![recdr release](https://img.shields.io/github/v/release/dzikrisyairozi/recdr?label=recdr)](https://github.com/dzikrisyairozi/recdr/releases/latest)
 
-<a href="https://recdr.dev"><img src="docs/images/home.png" alt="The recdr.dev home page: the headline, the install command, and a recording of a checkout page turning into a grid of frames" width="800"></a>
+<a href="https://recdr.dev"><img src="docs/images/home.png" alt="The recdr.dev home page: the headline, the install command, and under them an agent's recdr session beside the checkout page it recorded, on the frame where a Payment failed banner shows" width="800"></a>
 
 </div>
 
